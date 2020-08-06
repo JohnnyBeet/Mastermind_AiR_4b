@@ -1,9 +1,9 @@
 import pygame
 import random
 
-"""Słownik nazwa koloru -> wartość RGB koloru. Można przenieść to później do jakiegoś pliku CONFIG.txt"""
+""" Słownik nazwa koloru -> wartość RGB koloru. Można przenieść to później do jakiegoś pliku CONFIG.txt """
 colors = {"white": (255, 255, 255), "red": (255, 0, 0), "green": (0, 255, 0), "blue": (0, 0, 255), "yellow": (255, 255, 0),
-          "purple": (255, 0, 255), "aqua": (0, 255, 255), "black": (0, 0, 0)}
+          "purple": (200, 0, 255), "aqua": (0, 255, 255), "black": (0, 0, 0)}
 
 
 class GFXEntity:
@@ -33,11 +33,9 @@ class Peg(GFXEntity):
         pygame.draw.circle(self._window, self._color, self._pos, self._radius)
 
     def change(self, mouse_cords: list, clicked: list) -> list:
-        """
-            Metoda służy do zmieniania koloru kołka.
+        """ Metoda służy do zmieniania koloru kołka.
             Zwraca listę z wartościami boolowskimi, które są używane
             w niezawodnym systemie wprowadzania informacji z myszki (TRADEMARK)
-
         """
         for i, key in enumerate(colors):
             if i == self._state:
@@ -77,9 +75,10 @@ class Board(GFXEntity):
                     self.rows_of_pegs[i].append(Peg((100 + j*50, 100 + i*50), (255, 255, 255), 20, self._window))
         """ Definicja przycisku na planszy """
         self.button = Button((150, 500), (255, 0, 100), self._window, (200, 50))
+        self._message = "Jeszcze nic istotnego sie nie wydarzylo"
 
     def draw(self):
-        """Rysuje planszę wraz z kołkami w wskazanym oknie """
+        """ Rysuje planszę wraz z kołkami w wskazanym oknie """
         pygame.draw.rect(self._window, (100, 200, 100), self._rect)
         self.button.draw()
         for row in self.rows_of_pegs:
@@ -93,6 +92,15 @@ class Board(GFXEntity):
             clicked = peg.change(mouse_cords, clicked)
         return clicked
 
+    def get_message(self):
+        return self._message
+
+    def change_message(self, win: bool = False):
+        if win:
+            self._message = "WYGRALES  !"
+        else:
+            self._message = f'Kombinacja    {self.active_row}   nie   jest   prawidlowa'
+
 
 class Button(GFXEntity):
     """ Klasa przycisku """
@@ -100,11 +108,9 @@ class Button(GFXEntity):
         super().__init__(pos, color, window, size)
 
     def click_button(self, board: Board, mouse_cords: tuple, clicked: tuple) -> list:
-        """
-            Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu.
+        """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu.
             Nie jestem pewny, czy konieczne jest podawanie obiektu Planszy board.
             TODO: Rework aby to bez podawania board działało(jeżeli to możliwe)
-
         """
         active_row = board.active_row
         winning_pegs = board.winning_pegs
@@ -114,6 +120,7 @@ class Button(GFXEntity):
             board_state.append(peg._color)
         if self._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
             if board_state == winning_pegs:
+                board.change_message(True)
                 print("You won!")  # just for testing purposes
                 return [False, False]
             else:
