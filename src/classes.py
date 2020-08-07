@@ -95,11 +95,13 @@ class Board(GFXEntity):
     def get_message(self):
         return self._message
 
-    def change_message(self, win: bool = False):
-        if win:
+    def change_message(self, condition: str):
+        if condition == "win":
             self._message = "WYGRALES  !"
+        elif condition == "lose":
+            self._message = "PRZEGRALES  !"
         else:
-            self._message = f'Kombinacja    {self.active_row}   nie   jest   prawidlowa'
+            self._message = condition
 
 
 class Button(GFXEntity):
@@ -120,13 +122,22 @@ class Button(GFXEntity):
             board_state.append(peg._color)
         if self._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
             if board_state == winning_pegs:
-                board.change_message(True)
-                print("You won!")  # just for testing purposes
+                board.change_message("win")
                 return [False, False]
             else:
+                bulls, cows = 0, 0
+                already_counted = []
+                for i, value in enumerate(board_state):
+                    if value == winning_pegs[i]:
+                        bulls += 1
+                    elif value in winning_pegs and value not in already_counted:
+                        already_counted.append(value)
+                        cows += 1
+                board.change_message(f'{bulls} bulls    {cows}    cows')
                 active_row += 1
                 if active_row >= 8:
-                    active_row = 0
+                    board.change_message("lose")
+                    return [False, False]
             clicked = [False, True]
         board.active_row = active_row
         return clicked
