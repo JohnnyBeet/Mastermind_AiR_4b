@@ -1,4 +1,4 @@
-from src.classes import GFXEntity
+from src.game_classes import GFXEntity
 import pygame.freetype
 from typing import Tuple
 
@@ -14,7 +14,7 @@ class LogBox(GFXEntity):
         self._pos = [(pos[0] + 20, pos[1] + 20 + j * 30) for j in range(self._n_texts)]
         self._rects = [pygame.Rect(self._pos[i], (20, 20)) for i in range(self._n_texts)]
         self._texts = ["" for _ in range(self._n_texts)]
-        self._box_rect = pygame.Rect(self._pos[0], size)
+        self._rect = pygame.Rect(self._pos[0], size)
 
     def load_text(self, input_text: str):
         """ Wczytuje log z gry na koniec okna dialogowego """
@@ -27,6 +27,6 @@ class LogBox(GFXEntity):
 
     def print_text(self, font: pygame.freetype.Font):
         """ Wyświetla  okno dialogowe """
-        pygame.draw.rect(self._window, self._color, self._box_rect)
+        self.draw()
         for i, text in enumerate(self._texts):
             font.render_to(self._window, self._rects[i], text, self._text_color)

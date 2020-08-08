@@ -74,7 +74,7 @@ class Board(GFXEntity):
                 for j in range(self._n_pegs):
                     self.rows_of_pegs[i].append(Peg((100 + j*50, 100 + i*50), (255, 255, 255), 20, self._window))
         """ Definicja przycisku na planszy """
-        self.button = Button((150, 500), (255, 0, 100), self._window, (200, 50))
+        self.button = RollButton((150, 500), (255, 0, 100), self._window, (200, 50))
         self._message = "Jeszcze nic istotnego sie nie wydarzylo"
 
     def draw(self):
@@ -108,12 +108,24 @@ class Button(GFXEntity):
     """ Klasa przycisku """
     def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size):
         super().__init__(pos, color, window, size)
+        self.clicked = False
+
+    def interact(self, mouse_cords, clicked):
+        if self._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
+            self.clicked = True
+            return [False, True]
+        else:
+            self.clicked = False
+            return clicked
+
+
+class RollButton(Button):
+    """ Przycisk używany na planszy do sprawdzenia stanu gry """
+    def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size):
+        super().__init__(pos, color, window, size)
 
     def click_button(self, board: Board, mouse_cords: tuple, clicked: tuple) -> list:
-        """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu.
-            Nie jestem pewny, czy konieczne jest podawanie obiektu Planszy board.
-            TODO: Rework aby to bez podawania board działało(jeżeli to możliwe)
-        """
+        """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu. """
         active_row = board.active_row
         winning_pegs = board.winning_pegs
         rows_of_pegs = board.rows_of_pegs
@@ -125,6 +137,7 @@ class Button(GFXEntity):
                 board.change_message("win")
                 return [False, False]
             else:
+                # zlicza ile kolorów zostało trafionych przez gracza
                 bulls, cows = 0, 0
                 already_counted = []
                 for i, value in enumerate(board_state):
