@@ -1,0 +1,1 @@
+{"played_matches": 2, "won_matches": 4, "win_percentage": 6, "fav_gametype": {"Normal Mastermind": 1, "Bulls & Cows": 3}}
