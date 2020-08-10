@@ -6,7 +6,7 @@ import sys
 
 pygame.init()
 # TODO: przenieść parametry init elementów gry do pliku SP_CONFIG.txt w formacie JSON
-screen_size = width, height = 600, 800
+screen_size = width, height = 800, 900
 background = colors["black"]
 pygame.display.set_caption("Mastermind")
 game_font = pygame.freetype.Font("gfx/ARCADECLASSIC.ttf", 18)
@@ -19,8 +19,9 @@ ROW_NUM = None
 
 # TODO: funkcja pętli interakcji z użytkownikiem i wyświetlania obiektów
 
-menu = GameSettingMenu((100, 200), colors["aqua"], screen, (400, 400))
+menu = GameSettingMenu((100, 100), colors["aqua"], screen, (600, 600))
 mouse_logic_list = [False, True]
+
 while not(PEG_NUM and ROW_NUM):
     """ Pętla menu wyboru parametrów gry """
     for event in pygame.event.get():
@@ -40,8 +41,8 @@ while not(PEG_NUM and ROW_NUM):
         pygame.display.flip()
 
 
-board = Board((20, 20), (500, 700), (200, 100, 50), screen, PEG_NUM, ROW_NUM)
-logbox = LogBox((50, 550), (350, 100), (0, 0, 0), (255, 255, 255), screen, 4)
+board = Board((100, 20), (600, 850), (200, 100, 50), screen, PEG_NUM, ROW_NUM)
+logbox = LogBox((210, 700), (350, 100), (0, 0, 0), (255, 255, 255), screen, 4)
 
 winning_pegs_cn = [list(colors.keys())[list(colors.values()).index(i)] for i in board.winning_pegs]  # RGB -> color name
 print(winning_pegs_cn)  # just for testing purposes

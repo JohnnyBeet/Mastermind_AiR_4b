@@ -58,6 +58,26 @@ class Board(GFXEntity):
         self._n_pegs = n_pegs
         self.active_row = 0
 
+        # Skalowanie rozmiaru kołków na planszy w zależności od ich ilości
+        self.scaling_coeff = n_pegs/rows
+        self.peg_offset_x = 0
+        self.peg_offset_y = 0
+        if n_pegs == 3:
+            self.peg_size = round(55 * self.scaling_coeff)
+        elif rows > 9 and n_pegs < 5:
+            self.peg_size = round(40 * self.scaling_coeff)
+        elif rows > 16:
+            self.peg_size = round(28 * self.scaling_coeff)
+        else:
+            self.peg_size = round(25 * self.scaling_coeff)
+        if rows/n_pegs <= 2 and n_pegs <= 4 or n_pegs == 3:
+            self.peg_offset_x += 50
+        if rows/n_pegs <= 2 and n_pegs <= 3:
+            self.peg_offset_y += 20
+
+        self.change_x = 600/n_pegs
+        self.change_y = 550/rows
+
         """ Generuje ukryty kod do zgadnięcia """
         self.winning_pegs = []
         for i in range(n_pegs):
@@ -72,9 +92,11 @@ class Board(GFXEntity):
         for i, row in enumerate(self.rows_of_pegs):
             if not row:
                 for j in range(self._n_pegs):
-                    self.rows_of_pegs[i].append(Peg((100 + j*50, 100 + i*50), (255, 255, 255), 20, self._window))
+                    self.rows_of_pegs[i].append(Peg((150 + self.peg_offset_x + round(self.change_x*j),
+                                                     100 + self.peg_offset_y + round(self.change_y*i)),
+                                                    (255, 255, 255), self.peg_size, self._window))
         """ Definicja przycisku na planszy """
-        self.button = RollButton((150, 500), (255, 0, 100), self._window, (200, 50))
+        self.button = RollButton((300, 645), (255, 0, 100), self._window, (200, 50))
         self._message = "Jeszcze nic istotnego sie nie wydarzylo"
 
     def draw(self):

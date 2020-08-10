@@ -3,7 +3,7 @@ import pygame.freetype
 import pygame.gfxdraw
 
 # WORK IN PROGRESS
-AVAILABLE_CODE_LENGHTS = [str(i) for i in range(3, 9)]
+AVAILABLE_CODE_LENGHTS = [str(i) for i in range(3, 7)]
 AVAILABLE_DIFFICULTY_LVLS = ["easy", "normal", "hard", "master"]
 
 
@@ -104,11 +104,11 @@ class GameSettingMenu(GFXEntity):
     """ Klasa menu wyboru długości zgadywanego kodu oraz poziomu trudności gry """
     def __init__(self, pos, color, window, size):
         super().__init__(pos, color, window, size)
-        self.code_lenght_display = Display((pos[0] + 200, pos[1] + 30), (200, 80),
+        self.code_lenght_display = Display((pos[0] + 290, pos[1] + 120), (200, 80),
                                            color, window, AVAILABLE_CODE_LENGHTS)
-        self.difficulty_display = Display((pos[0] + 200, pos[1] + 130), (200, 80),
+        self.difficulty_display = Display((pos[0] + 290, pos[1] + 280), (200, 80),
                                           color, window, AVAILABLE_DIFFICULTY_LVLS, -30)
-        self.button = Button((175, 450), (0, 100, 0), self._window, (260, 80))
+        self.button = Button((260, 550), (0, 100, 0), self._window, (260, 80))
 
     def draw(self):
         super(GameSettingMenu, self).draw()
