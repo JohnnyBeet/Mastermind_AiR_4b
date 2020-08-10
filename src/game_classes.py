@@ -1,10 +1,15 @@
 import pygame
 import random
+import Statistics.statistics as stat
+
 
 """ Słownik nazwa koloru -> wartość RGB koloru. Można przenieść to później do jakiegoś pliku CONFIG.txt """
 colors = {"white": (255, 255, 255), "red": (255, 0, 0), "green": (0, 255, 0), "blue": (0, 0, 255), "yellow": (255, 255, 0),
           "purple": (200, 0, 255), "aqua": (0, 255, 255), "black": (0, 0, 0)}
 
+""" data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
+data = stat.Stats()
+data.load_stats()  # wczytuje poprzednie statystyki, zeby ich nie utracic
 
 class GFXEntity:
     """ Klasa macierzysta zawierająca podstawowe parametry obiektu graficznego w pygame """
@@ -157,6 +162,9 @@ class RollButton(Button):
         if self._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
             if board_state == winning_pegs:
                 board.change_message("win")
+                data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
+                data.win_percentage = (data.won_matches/data.played_matches) * 100
+                data.save_stats()
                 return [False, False]
             else:
                 # zlicza ile kolorów zostało trafionych przez gracza

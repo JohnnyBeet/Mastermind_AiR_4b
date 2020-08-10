@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import pygame
-from Buttons import Button
+from Menu.Buttons import Button
 
-class App:
+
+class Menu:
+
+    """ Główne menu gry """
     def __init__(self):
         self._running = True
         self.display_surf = None
@@ -12,12 +15,12 @@ class App:
         self.color = (255, 192, 203)
         self._running = True
 
-        pygame.init() # umożliwia korzystanie z pygame
-        #narysuj tło
+        pygame.init()
+        # narysuj tło
         self.display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self.display_surf.fill(self.color)
 
-        #rysuje tytuł
+        # rysuje tytuł
         self.title = "MASTERMIND"
         font = pygame.font.SysFont('comicsans', 52)
         title = font.render(self.title, 1, (47,23,56))
@@ -39,25 +42,20 @@ class App:
         self.info = Button((0, 100, 200), 280, 290, 100, 40, "Instructions")
         self.info.draw(self.display_surf)
 
-        #rysuje przycisk "Wyjscie"
+        # rysuje przycisk "Wyjscie"
         self.esc = Button((0, 100, 200), 280, 340, 100, 40, "Exit")
         self.esc.draw(self.display_surf)
 
         pygame.display.update()
 
     def on_event(self, event):
+        """ Metoda odpowiedzialna za obsługe przycisków"""
         if event.type == pygame.QUIT:
             self._running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
             if self.esc.is_pointing(pos):
                 self._running = False
-
-    # def on_loop(self):
-    #     pass
-    #
-    # def on_render(self):
-    #     pass
 
     def on_cleanup(self):
         pygame.quit()
@@ -67,11 +65,9 @@ class App:
         while self._running:
             for event in pygame.event.get():
                 self.on_event(event)
-            # self.on_loop()
-            # self.on_render()
         self.on_cleanup()
 
 
 if __name__ == "__main__":
-    theApp = App()
-    theApp.on_execute()
+    theMenu = Menu()
+    theMenu.on_execute()

@@ -1,1 +1,1 @@
-{"played_matches": 2, "won_matches": 4, "win_percentage": 6, "fav_gametype": {"Normal Mastermind": 1, "Bulls & Cows": 3}}
+{"played_matches": 9, "won_matches": 5, "win_percentage": 55.55555555555556, "fav_gametype": {"Normal Mastermind": 0, "Bulls & Cows": 0}}

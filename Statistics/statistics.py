@@ -9,7 +9,7 @@ class Stats:
         self.played_matches = 0
         self.won_matches = 0
         self.win_percentage = 0
-        self.fav_gametype = {"Normal Mastermind": 0 , "Bulls & Cows": 0 }
+        self.fav_gametype = {"Normal Mastermind": 0 , "Word Version": 0 }
 
     def save_stats(self):
         with open('Statistics/stats.txt', 'w') as outfile:
