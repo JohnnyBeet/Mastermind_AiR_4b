@@ -12,12 +12,8 @@ pygame.display.set_caption("Mastermind")
 game_font = pygame.freetype.Font("gfx/ARCADECLASSIC.ttf", 18)
 screen = pygame.display.set_mode(screen_size)
 
-# TODO: uzależnić rozmiar planszy oraz elementów na niej się znajdujących od PEG_NUM oraz ROW_NUM
-
 PEG_NUM = None
 ROW_NUM = None
-
-# TODO: funkcja pętli interakcji z użytkownikiem i wyświetlania obiektów
 
 menu = GameSettingMenu((100, 100), colors["aqua"], screen, (600, 600))
 mouse_logic_list = [False, True]

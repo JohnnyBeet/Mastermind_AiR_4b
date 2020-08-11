@@ -4,12 +4,13 @@ import Statistics.statistics as stat
 
 
 """ Słownik nazwa koloru -> wartość RGB koloru. Można przenieść to później do jakiegoś pliku CONFIG.txt """
-colors = {"white": (255, 255, 255), "red": (255, 0, 0), "green": (0, 255, 0), "blue": (0, 0, 255), "yellow": (255, 255, 0),
-          "purple": (200, 0, 255), "aqua": (0, 255, 255), "black": (0, 0, 0)}
+colors = {"white": (255, 255, 255), "red": (255, 0, 0), "green": (0, 255, 0), "blue": (0, 0, 255),
+          "yellow": (255, 255, 0), "purple": (200, 0, 255), "aqua": (0, 255, 255), "black": (0, 0, 0)}
 
 """ data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
 data = stat.Stats()
 data.load_stats()  # wczytuje poprzednie statystyki, zeby ich nie utracic
+
 
 class GFXEntity:
     """ Klasa macierzysta zawierająca podstawowe parametry obiektu graficznego w pygame """
@@ -62,27 +63,18 @@ class Board(GFXEntity):
         super().__init__(pos, color, window, size)
         self._n_pegs = n_pegs
         self.active_row = 0
+        self.n_rows = rows
 
         # Skalowanie rozmiaru kołków na planszy w zależności od ich ilości
-        self.scaling_coeff = n_pegs/rows
-        self.peg_offset_x = 0
-        self.peg_offset_y = 0
-        if n_pegs == 3:
-            self.peg_size = round(55 * self.scaling_coeff)
-        elif rows > 9 and n_pegs < 5:
-            self.peg_size = round(40 * self.scaling_coeff)
-        elif rows > 16:
-            self.peg_size = round(28 * self.scaling_coeff)
-        else:
-            self.peg_size = round(25 * self.scaling_coeff)
-        if rows/n_pegs <= 2 and n_pegs <= 4 or n_pegs == 3:
-            self.peg_offset_x += 50
-        if rows/n_pegs <= 2 and n_pegs <= 3:
-            self.peg_offset_y += 20
-
+        self.scaling_coeff = 5 - rows/n_pegs
+        self.peg_offset_x = 50 + (3-n_pegs) * 20
+        self.peg_offset_y = round(-45 + 30 * self.scaling_coeff)
+        if n_pegs >= 5 or n_pegs == 4 and rows < 12:
+            self.peg_offset_y -= 50
         self.change_x = 600/n_pegs
         self.change_y = 550/rows
-
+        self.peg_size = self.scaling_coeff * self.change_x/14
+        self.peg_size = round(self.peg_size)
         """ Generuje ukryty kod do zgadnięcia """
         self.winning_pegs = []
         for i in range(n_pegs):
@@ -102,7 +94,7 @@ class Board(GFXEntity):
                                                     (255, 255, 255), self.peg_size, self._window))
         """ Definicja przycisku na planszy """
         self.button = RollButton((300, 645), (255, 0, 100), self._window, (200, 50))
-        self._message = "Jeszcze nic istotnego sie nie wydarzylo"
+        self._message = "Rozpoczales    nowa    gre"
 
     def draw(self):
         """ Rysuje planszę wraz z kołkami w wskazanym oknie """
@@ -157,31 +149,46 @@ class RollButton(Button):
         winning_pegs = board.winning_pegs
         rows_of_pegs = board.rows_of_pegs
         board_state = []
+        n_pegs = board._n_pegs
         for peg in rows_of_pegs[active_row]:
             board_state.append(peg._color)
+
         if self._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
-            if board_state == winning_pegs:
-                board.change_message("win")
-                data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
-                data.win_percentage = (data.won_matches/data.played_matches) * 100
-                data.save_stats()
-                return [False, False]
-            else:
-                # zlicza ile kolorów zostało trafionych przez gracza
-                bulls, cows = 0, 0
-                already_counted = []
-                for i, value in enumerate(board_state):
-                    if value == winning_pegs[i]:
-                        bulls += 1
-                    elif value in winning_pegs and value not in already_counted:
-                        already_counted.append(value)
-                        cows += 1
-                board.change_message(f'{bulls} bulls    {cows}    cows')
-                active_row += 1
-                if active_row >= 8:
-                    board.change_message("lose")
+            if board_state != [(255, 255, 255) for _ in range(n_pegs)] != winning_pegs:
+                if board_state == winning_pegs:
+                    board.change_message("win")
+                    data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
+                    data.win_percentage = (data.won_matches/data.played_matches) * 100
+                    data.save_stats()
                     return [False, False]
-            clicked = [False, True]
+                else:
+                    # zlicza ile kolorów zostało trafionych przez gracza
+                    bulls, cows = 0, 0
+                    already_used_user = [False for _ in range(n_pegs)]
+                    already_used_secret = [False for _ in range(n_pegs)]
+                    for i, value in enumerate(board_state):
+                        if value == winning_pegs[i]:
+                            bulls += 1
+                            already_used_secret[i] = True
+                            already_used_user[i] = True
+                    for i in range(n_pegs):
+                        for j in range(n_pegs):
+                            if already_used_user[j] or already_used_secret[i]:
+                                continue
+                            if winning_pegs[i] == board_state[j]:
+                                cows += 1
+                                already_used_secret[i] = True
+                                already_used_user[j] = True
+
+                    board.change_message(f'{board.active_row+1}{" "*8}Row{" "*8}{bulls}{" "*8}bulls{" "*8}{cows}{" "*8}'
+                                         f'cows')
+                    active_row += 1
+                    if active_row >= board.n_rows:
+                        board.change_message("lose")
+                        return [False, False]
+                clicked = [False, True]
+            else:
+                board.change_message("Wszystkie    pola    nie    moga    byc    puste!")
         board.active_row = active_row
         return clicked
 

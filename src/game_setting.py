@@ -77,7 +77,7 @@ class Display(GFXEntity):
                     self.display_pos = self._pos[0] + self.offset, self.display_pos[1]
                     self.display_rect = pygame.Rect(self.display_pos, self.display_size)
             clicked = [False, True]
-
+        # TODO: wyświetlane napisy powinny zostać stworzone podczas inicjalizacji obiektu menu
         if self.right_button._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
             self.value_index = self.right_button.change_value(self.value_index, self.values_range)
             self.displayed_value = self.displayable_values[self.value_index]
