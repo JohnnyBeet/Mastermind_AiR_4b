@@ -14,3 +14,9 @@ Grupa wybrała do realizacji projektu platformę GitHub,  ponieważ  posiada on 
 ## Na czym polega Mastermind?
 Mastermind to gra polegająca na odgadnięciu kodu w określonej liczbie rund. W podstawowej wersji wylosowany kod składa się z sekwencji kolorowych kul. W skład kodu mogą wchodzić kule o tej samej barwie. Po sprawdzeniu wprowadzone przez gracza sekwencji, otrzyma on infrormację o poprawności ułożenia kul. W słownej informacji zwrotnej pojawi się liczba bulls (kula o dobrym kolorze w odpowiednim miejscu) i cows (kula o dobrym kolorze w niewłaściwym miejscu). Gra kończy się w momencie podania identycznej sekwencji (zwycięztwo) jak wylosowana lub po przekroczeniu maksymalnej liczby rund (porażka).
 Ponadto w tej wersji gry można grać w trybie słownym. Polega on na odgadnięciu słowa (w języku angielskim). Słowa mają 4-6 znaków i nie są zbudowane z losowych liter (normalnie występujące słowa). Dzięki tej wersji oprócz myślenia możesz ćwiczyć angielskie słówka.
+
+## Technologia
+Przy tworzeniu projektu korzystano z następujących narzędzi:
+ - Python 3.8
+ - pygame 1.9.6
+ - JSON
