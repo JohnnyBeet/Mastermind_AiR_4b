@@ -124,6 +124,7 @@ class Board(GFXEntity):
             self._message = condition
 
     def get_rects(self):
+        """ Zwraca obiekty typu rect potrzebne to sprawdzania kolizji z myszką """
         rects = [self.button.get_rect()]
         for row in self.rows_of_pegs:
             for peg in row:
@@ -203,4 +204,5 @@ class CheckButton(Button):
         return clicked
 
     def get_rect(self):
+        """ Zwraca obiekt typu rect potrzebny to sprawdzania kolizji z myszką """
         return self._rect.copy()

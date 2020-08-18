@@ -9,8 +9,8 @@ import sys
 def play_game():
     """ Ta funkcja jest konieczna do odpalenia gry z poziomu menu, uzycie exec() na tym pliku
         nie dawalo oczekiwanych rezultatow. """
+
     pygame.init()
-    # TODO: przenieść parametry init elementów gry do pliku SP_CONFIG.txt w formacie JSON
     screen_size = game_configs["screen_size"]
     background = colors["black"]
     pygame.display.set_caption(game_configs["display_caption"])

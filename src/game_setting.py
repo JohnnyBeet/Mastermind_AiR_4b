@@ -2,7 +2,7 @@ from src.game_classes import Button, GFXEntity
 import pygame.freetype
 import pygame.gfxdraw
 from src.game_classes import data
-
+from src.settings_loading import game_configs
 AVAILABLE_CODE_LENGHTS = [str(i) for i in range(3, 7)]
 AVAILABLE_DIFFICULTY_LVLS = ["easy", "normal", "hard", "master"]
 
@@ -52,7 +52,7 @@ class Display(GFXEntity):
     default_offset = 0
     value_index = 0
 
-    def __init__(self, pos, size, color, window, values, offset=0, font="gfx/ARCADECLASSIC.ttf", display_size=(60, 120),
+    def __init__(self, pos, size, color, window, values, font=game_configs["font_path"], display_size=(60, 120),
                  font_size=30, font_color=(255, 255, 255)):
         super().__init__(pos, color, window, size)
         self.displayable_values = values
