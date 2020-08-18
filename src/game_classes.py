@@ -1,7 +1,7 @@
 import pygame
 import random
 import Statistics.statistics as stat
-
+from abc import ABC
 
 """ Słownik nazwa koloru -> wartość RGB koloru. Można przenieść to później do jakiegoś pliku CONFIG.txt """
 colors = {"white": (255, 255, 255), "red": (255, 0, 0), "green": (0, 255, 0), "blue": (0, 0, 255),
@@ -12,7 +12,7 @@ data = stat.Stats()
 data.load_stats()  # wczytuje poprzednie statystyki, zeby ich nie utracic
 
 
-class GFXEntity:
+class GFXEntity(ABC):
     """ Klasa macierzysta zawierająca podstawowe parametry obiektu graficznego w pygame """
     def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size: tuple = (0, 0)):
         self._pos = pos  # (x, y)
@@ -27,12 +27,14 @@ class GFXEntity:
 
 
 class Peg(GFXEntity):
+
+    _state = 0
+
     """ Klasa kołka/kamyczka (w zależności od interpretacji wizualnej) """
     def __init__(self, pos: tuple, color: tuple, radius: int, window: pygame.Surface):
         super().__init__(pos, color, window)
         self._radius = radius
         self._rect = pygame.draw.circle(self._window, self._color, self._pos, self._radius)
-        self._state = 0
 
     def draw(self):
         """ Rysuje kołek w wskazanym oknie """
@@ -41,7 +43,7 @@ class Peg(GFXEntity):
     def change(self, mouse_cords: list, clicked: list) -> list:
         """ Metoda służy do zmieniania koloru kołka.
             Zwraca listę z wartościami boolowskimi, które są używane
-            w niezawodnym systemie wprowadzania informacji z myszki (TRADEMARK)
+            w niezawodnym systemie wprowadzania informacji z myszki
         """
         for i, key in enumerate(colors):
             if i == self._state:
@@ -59,13 +61,15 @@ class Peg(GFXEntity):
 
 class Board(GFXEntity):
     """ Klasa planszy """
+
+    active_row = 0
+
     def __init__(self, pos: tuple, size: tuple, color: tuple, window: pygame.Surface, n_pegs: int, rows: int):
         super().__init__(pos, color, window, size)
         self._n_pegs = n_pegs
-        self.active_row = 0
         self.n_rows = rows
 
-        # Skalowanie rozmiaru kołków na planszy w zależności od ich ilości
+        """ Skalowanie rozmiaru kołków na planszy w zależności od ich ilości """
         self.scaling_coeff = 5 - rows/n_pegs
         self.peg_offset_x = 50 + (3-n_pegs) * 20
         self.peg_offset_y = round(-45 + 30 * self.scaling_coeff)
@@ -93,7 +97,7 @@ class Board(GFXEntity):
                                                      100 + self.peg_offset_y + round(self.change_y*i)),
                                                     (255, 255, 255), self.peg_size, self._window))
         """ Definicja przycisku na planszy """
-        self.button = RollButton((300, 645), (255, 0, 100), self._window, (200, 50))
+        self.button = CheckButton((300, 645), (255, 0, 100), self._window, (200, 50))
         self._message = "Rozpoczales    nowa    gre"
 
     def draw(self):
@@ -122,12 +126,21 @@ class Board(GFXEntity):
         else:
             self._message = condition
 
+    def get_rects(self):
+        rects = [self.button.get_rect()]
+        for row in self.rows_of_pegs:
+            for peg in row:
+                rects.append(peg._rect.copy())
+        return rects
+
 
 class Button(GFXEntity):
     """ Klasa przycisku """
+
+    clicked = False
+
     def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size):
         super().__init__(pos, color, window, size)
-        self.clicked = False
 
     def interact(self, mouse_cords, clicked):
         if self._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
@@ -138,7 +151,7 @@ class Button(GFXEntity):
             return clicked
 
 
-class RollButton(Button):
+class CheckButton(Button):
     """ Przycisk używany na planszy do sprawdzenia stanu gry """
     def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size):
         super().__init__(pos, color, window, size)
@@ -192,3 +205,5 @@ class RollButton(Button):
         board.active_row = active_row
         return clicked
 
+    def get_rect(self):
+        return self._rect.copy()

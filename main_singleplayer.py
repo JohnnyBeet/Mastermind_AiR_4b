@@ -4,24 +4,27 @@ from src.logbox import LogBox
 from src.game_setting import GameSettingMenu
 import sys
 
+
 def play_game():
     """ Ta funkcja jest konieczna do odpalenia gry z poziomu menu, uzycie exec() na tym pliku
         nie dawalo oczekiwanych rezultatow. """
     pygame.init()
     # TODO: przenieść parametry init elementów gry do pliku SP_CONFIG.txt w formacie JSON
-    screen_size = width, height = 800, 900
+    screen_size = 800, 900
     background = colors["black"]
     pygame.display.set_caption("Mastermind")
     game_font = pygame.freetype.Font("gfx/ARCADECLASSIC.ttf", 18)
     screen = pygame.display.set_mode(screen_size)
 
-    PEG_NUM = None
-    ROW_NUM = None
+    peg_num = None
+    row_num = None
 
     menu = GameSettingMenu((100, 100), colors["aqua"], screen, (600, 600))
+    menu.draw()  # pygame.Rect trójkątnych przycisków pojawiają się dopiero po narysowaniu
+    clickable_rects = menu.get_rects()
     mouse_logic_list = [False, True]
 
-    while not(PEG_NUM and ROW_NUM):
+    while not(peg_num and row_num):
         """ Pętla menu wyboru parametrów gry """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -30,22 +33,29 @@ def play_game():
                 if pygame.mouse.get_pressed()[0]:
                     mouse_logic_list = [True, False]
             if event.type == pygame.MOUSEBUTTONUP:
+                first_check = False
+                second_check = False
                 if not pygame.mouse.get_pressed()[0] and mouse_logic_list[0]:
+                    first_check = True
+                for rect in clickable_rects:
+                    x, y = pygame.mouse.get_pos()
+                    if rect.collidepoint(x, y):
+                        second_check = True
+                        break
+                if first_check and second_check:
                     mouse_logic_list = [True, True]
+                else:
+                    mouse_logic_list = [False, True]
 
             screen.fill(background)
             menu.draw()
             mouse_logic_list = menu.check(pygame.mouse.get_pos(), mouse_logic_list)
-            PEG_NUM, ROW_NUM = menu.return_game_settings()
+            peg_num, row_num = menu.return_game_settings()
             pygame.display.flip()
 
-
-    board = Board((100, 20), (600, 850), (200, 100, 50), screen, PEG_NUM, ROW_NUM)
+    board = Board((100, 20), (600, 850), (200, 100, 50), screen, peg_num, row_num)
     logbox = LogBox((210, 700), (350, 100), (0, 0, 0), (255, 255, 255), screen, 4)
-
-    winning_pegs_cn = [list(colors.keys())[list(colors.values()).index(i)] for i in board.winning_pegs]  # RGB -> color name
-    print(winning_pegs_cn)  # just for testing purposes
-
+    clickable_rects = board.get_rects()
     mouse_logic_list = [False, True]  # [ LPM został wciśnięty , LPM został wciśnięty a później opuszczony ]
     end_game = False
 
@@ -60,8 +70,19 @@ def play_game():
                     if end_game:
                         sys.exit()
             if event.type == pygame.MOUSEBUTTONUP:
+                first_check = False
+                second_check = False
                 if not pygame.mouse.get_pressed()[0] and mouse_logic_list[0]:
+                    first_check = True
+                for rect in clickable_rects:
+                    x, y = pygame.mouse.get_pos()
+                    if rect.collidepoint(x, y):
+                        second_check = True
+                        break
+                if first_check and second_check:
                     mouse_logic_list = [True, True]
+                else:
+                    mouse_logic_list = [False, True]
 
         screen.fill(background)
         board.draw()

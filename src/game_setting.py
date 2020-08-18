@@ -3,7 +3,6 @@ import pygame.freetype
 import pygame.gfxdraw
 from src.game_classes import data
 
-# WORK IN PROGRESS
 AVAILABLE_CODE_LENGHTS = [str(i) for i in range(3, 7)]
 AVAILABLE_DIFFICULTY_LVLS = ["easy", "normal", "hard", "master"]
 
@@ -43,53 +42,54 @@ class TriangularButton(Button):
         else:
             return i
 
+    def get_rect(self):
+        return self._rect.copy()
+
 
 class Display(GFXEntity):
     """ Klasa menu wyboru długości kodu oraz poziomu trudności """
+
+    default_offset = 0
+    value_index = 0
+
     def __init__(self, pos, size, color, window, values, offset=0, font="gfx/ARCADECLASSIC.ttf", display_size=(60, 120),
                  font_size=30, font_color=(255, 255, 255)):
         super().__init__(pos, color, window, size)
         self.displayable_values = values
         self.displayed_value = values[0]
-        self.value_index = 0
         self.values_range = [i for i, _ in enumerate(self.displayable_values)]
         self.font = pygame.freetype.Font(font, font_size)
         self.font_color = font_color
-        self.offset = offset
-        self.display_pos = pos[0] + offset, pos[1] + 15
         self.display_size = display_size
-        self.display_rect = pygame.Rect(self.display_pos, self.display_size)
         self.left_button = TriangularButton((pos[0] - 100, pos[1]), (200, 0, 0), window, 50, "left")
         self.right_button = TriangularButton((pos[0] + 100, pos[1]), (200, 0, 0), window, 50, "right")
 
+    @property
+    def offset(self):
+        if self.displayed_value in ["easy", "hard"]:
+            self.default_offset = -30
+        elif self.displayed_value in ["normal", "master"]:
+            self.default_offset = -45
+        return self.default_offset
+
+    @property
+    def display_pos(self):
+        return self._pos[0] + self.offset, self._pos[1] + 15
+
+    @property
+    def display_rect(self):
+        return pygame.Rect(self.display_pos, self.display_size)
+
     def change_value(self, mouse_cords: list, clicked: list) -> list:
-        """ Zmienia wartość wyświetlanej wartości zmiennej - trochę przekombinowane """
+        """ Zmienia wartość wyświetlanej wartości zmiennej """
         if self.left_button._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
             self.value_index = self.left_button.change_value(self.value_index, self.values_range)
             self.displayed_value = self.displayable_values[self.value_index]
-            if self.offset != 0:
-                if self.displayed_value in ["easy", "hard"]:
-                    self.offset = -30
-                    self.display_pos = self._pos[0] + self.offset, self.display_pos[1]
-                    self.display_rect = pygame.Rect(self.display_pos, self.display_size)
-                elif self.displayed_value in ["normal", "master"]:
-                    self.offset = -45
-                    self.display_pos = self._pos[0] + self.offset, self.display_pos[1]
-                    self.display_rect = pygame.Rect(self.display_pos, self.display_size)
             clicked = [False, True]
-        # TODO: wyświetlane napisy powinny zostać stworzone podczas inicjalizacji obiektu menu
+
         if self.right_button._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
             self.value_index = self.right_button.change_value(self.value_index, self.values_range)
             self.displayed_value = self.displayable_values[self.value_index]
-            if self.offset != 0:
-                if self.displayed_value in ["easy", "hard"]:
-                    self.offset = -30
-                    self.display_pos = self._pos[0] + self.offset, self.display_pos[1]
-                    self.display_rect = pygame.Rect(self.display_pos, self.display_size)
-                elif self.displayed_value in ["normal", "master"]:
-                    self.offset = -45
-                    self.display_pos = self._pos[0] + self.offset, self.display_pos[1]
-                    self.display_rect = pygame.Rect(self.display_pos, self.display_size)
             clicked = [False, True]
 
         return clicked
@@ -135,3 +135,10 @@ class GameSettingMenu(GFXEntity):
             return code_lenght, diff_lvl
         else:
             return None, None
+
+    def get_rects(self):
+        """ Zwraca obiekty typu rect potrzebne to sprawdzania kolizji z myszką """
+        rects = [self.button._rect.copy(), self.difficulty_display.left_button.get_rect().copy(),
+                 self.difficulty_display.right_button.get_rect(), self.code_lenght_display.left_button.get_rect(),
+                 self.code_lenght_display.right_button.get_rect()]
+        return rects
