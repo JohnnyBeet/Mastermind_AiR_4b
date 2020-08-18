@@ -1,7 +1,8 @@
 import pygame.freetype
-from src.game_classes import Board, colors
+from src.game_classes import Board
 from src.logbox import LogBox
 from src.game_setting import GameSettingMenu
+from src.settings_loading import colors, game_configs, menu_configs, board_configs, logbox_configs
 import sys
 
 
@@ -10,16 +11,16 @@ def play_game():
         nie dawalo oczekiwanych rezultatow. """
     pygame.init()
     # TODO: przenieść parametry init elementów gry do pliku SP_CONFIG.txt w formacie JSON
-    screen_size = 800, 900
+    screen_size = game_configs["screen_size"]
     background = colors["black"]
-    pygame.display.set_caption("Mastermind")
-    game_font = pygame.freetype.Font("gfx/ARCADECLASSIC.ttf", 18)
+    pygame.display.set_caption(game_configs["display_caption"])
+    game_font = pygame.freetype.Font(game_configs["font_path"], game_configs["font_size"])
     screen = pygame.display.set_mode(screen_size)
 
     peg_num = None
     row_num = None
 
-    menu = GameSettingMenu((100, 100), colors["aqua"], screen, (600, 600))
+    menu = GameSettingMenu(menu_configs["pos"], colors["aqua"], screen, menu_configs["size"])
     menu.draw()  # pygame.Rect trójkątnych przycisków pojawiają się dopiero po narysowaniu
     clickable_rects = menu.get_rects()
     mouse_logic_list = [False, True]
@@ -53,8 +54,9 @@ def play_game():
             peg_num, row_num = menu.return_game_settings()
             pygame.display.flip()
 
-    board = Board((100, 20), (600, 850), (200, 100, 50), screen, peg_num, row_num)
-    logbox = LogBox((210, 700), (350, 100), (0, 0, 0), (255, 255, 255), screen, 4)
+    board = Board(board_configs["pos"], board_configs["size"], board_configs["color"], screen, peg_num, row_num)
+    logbox = LogBox(logbox_configs["pos"], logbox_configs["size"], logbox_configs["background_color"],
+                    logbox_configs["text_color"], screen, logbox_configs["number_of_messages_displayed"])
     clickable_rects = board.get_rects()
     mouse_logic_list = [False, True]  # [ LPM został wciśnięty , LPM został wciśnięty a później opuszczony ]
     end_game = False

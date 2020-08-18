@@ -8,7 +8,7 @@ AVAILABLE_DIFFICULTY_LVLS = ["easy", "normal", "hard", "master"]
 
 
 class TriangularButton(Button):
-    " Przycisk używany do zmiany parametrów startowych gry "
+    """ Przycisk używany do zmiany parametrów startowych gry """
     def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, side, orientation):
         super().__init__(pos, color, window, (0, 0))
         self.side = side

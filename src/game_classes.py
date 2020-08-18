@@ -2,10 +2,7 @@ import pygame
 import random
 import Statistics.statistics as stat
 from abc import ABC
-
-""" Słownik nazwa koloru -> wartość RGB koloru. Można przenieść to później do jakiegoś pliku CONFIG.txt """
-colors = {"white": (255, 255, 255), "red": (255, 0, 0), "green": (0, 255, 0), "blue": (0, 0, 255),
-          "yellow": (255, 255, 0), "purple": (200, 0, 255), "aqua": (0, 255, 255), "black": (0, 0, 0)}
+from src.settings_loading import colors
 
 """ data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
 data = stat.Stats()
