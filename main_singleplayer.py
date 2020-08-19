@@ -92,5 +92,6 @@ def play_game():
         mouse_logic_list = board.button.click_button(board, pygame.mouse.get_pos(), mouse_logic_list)
         logbox.load_text(board.get_message())
         logbox.print_text(game_font)
-        end_game = not(mouse_logic_list[0] or mouse_logic_list[1])  # po wygraniu gra sie konczy po jednym LPM
+        lmb, rmb = mouse_logic_list
+        end_game = not(lmb or rmb)  # po wygraniu gra sie konczy po jednym LPM
         pygame.display.flip()

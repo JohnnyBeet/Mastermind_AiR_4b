@@ -14,4 +14,5 @@ game_configs = data["gamesettings"]
 menu_configs = data["menu"]
 board_configs = data["board"]
 logbox_configs = data["logbox"]
-
+menu_button_configs = data["GameSettingMenuButton"]
+checkbutton_configs = data["checkbutton"]

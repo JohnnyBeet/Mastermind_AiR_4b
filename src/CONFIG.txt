@@ -70,9 +70,9 @@
             850
         ],
         "color": [
-            200,
             100,
-            50
+            200,
+            100
         ]
     },
     "logbox": {
@@ -95,5 +95,36 @@
             0
         ],
         "number_of_messages_displayed": 4
+    },
+    "GameSettingMenuButton": {
+        "pos": [
+            260,
+            550
+        ],
+        "color": [
+            0,
+            100,
+            0
+        ],
+        "size": [
+            260,
+            80
+        ]
+    },
+    "checkbutton": {
+        "pos": [
+            300,
+            645
+        ],
+        "color": [
+            255,
+              0,
+            100
+        ],
+        "size": [
+            200,
+             50
+        ]
+
     }
 }

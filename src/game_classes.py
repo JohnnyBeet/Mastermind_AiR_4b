@@ -2,7 +2,7 @@ import pygame
 import random
 import Statistics.statistics as stat
 from abc import ABC
-from src.settings_loading import colors
+from src.settings_loading import colors, checkbutton_configs, game_configs
 
 """ data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
 data = stat.Stats()
@@ -48,18 +48,30 @@ class Peg(GFXEntity):
                 if i == len(colors) - 1:
                     self._state = 0
                 break
-
-        if self._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
+        x, y = mouse_cords
+        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
+        if self._rect.collidepoint(x, y) and lmb and rmb:
             self._state += 1
             clicked = [False, True]
 
         return clicked
+
+    @property
+    def color(self):
+        return self._color
+
+    @property
+    def rect(self):
+        return self._rect
 
 
 class Board(GFXEntity):
     """ Klasa planszy """
 
     active_row = 0
+    x, y = game_configs["screen_size"]
+    change_x_base, change_y_base = x - 200, y - 350  # gra w małych rozdzielczościach nie jest wskazana
+    base_peg_x, base_peg_y = 150, 100
 
     def __init__(self, pos: tuple, size: tuple, color: tuple, window: pygame.Surface, n_pegs: int, rows: int):
         super().__init__(pos, color, window, size)
@@ -72,10 +84,11 @@ class Board(GFXEntity):
         self.peg_offset_y = round(-45 + 30 * self.scaling_coeff)
         if n_pegs >= 5 or n_pegs == 4 and rows < 12:
             self.peg_offset_y -= 50
-        self.change_x = 600/n_pegs
-        self.change_y = 550/rows
+        self.change_x = self.change_x_base/n_pegs
+        self.change_y = self.change_y_base/rows
         self.peg_size = self.scaling_coeff * self.change_x/14
         self.peg_size = round(self.peg_size)
+
         """ Generuje ukryty kod do zgadnięcia """
         self.winning_pegs = []
         for i in range(n_pegs):
@@ -90,16 +103,19 @@ class Board(GFXEntity):
         for i, row in enumerate(self.rows_of_pegs):
             if not row:
                 for j in range(self._n_pegs):
-                    self.rows_of_pegs[i].append(Peg((150 + self.peg_offset_x + round(self.change_x*j),
-                                                     100 + self.peg_offset_y + round(self.change_y*i)),
-                                                    (255, 255, 255), self.peg_size, self._window))
+                    self.rows_of_pegs[i].append(Peg((self.base_peg_x + self.peg_offset_x + round(self.change_x*j),
+                                                     self.base_peg_y + self.peg_offset_y + round(self.change_y*i)),
+                                                    colors["white"], self.peg_size, self._window))
+
         """ Definicja przycisku na planszy """
-        self.button = CheckButton((300, 645), (255, 0, 100), self._window, (200, 50))
+        self.button = CheckButton(checkbutton_configs["pos"], checkbutton_configs["color"], self._window,
+                                  checkbutton_configs["size"])
+
         self._message = "Rozpoczales    nowa    gre"
 
     def draw(self):
         """ Rysuje planszę wraz z kołkami w wskazanym oknie """
-        pygame.draw.rect(self._window, (100, 200, 100), self._rect)
+        pygame.draw.rect(self._window, self._color, self._rect)
         self.button.draw()
         for row in self.rows_of_pegs:
             if row:
@@ -128,8 +144,12 @@ class Board(GFXEntity):
         rects = [self.button.get_rect()]
         for row in self.rows_of_pegs:
             for peg in row:
-                rects.append(peg._rect.copy())
+                rects.append(peg.rect.copy())
         return rects
+
+    @property
+    def n_pegs(self):
+        return self._n_pegs
 
 
 class Button(GFXEntity):
@@ -141,7 +161,9 @@ class Button(GFXEntity):
         super().__init__(pos, color, window, size)
 
     def interact(self, mouse_cords, clicked):
-        if self._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
+        x, y = mouse_cords
+        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
+        if self._rect.collidepoint(x, y) and lmb and rmb:
             self.clicked = True
             return [False, True]
         else:
@@ -160,12 +182,14 @@ class CheckButton(Button):
         winning_pegs = board.winning_pegs
         rows_of_pegs = board.rows_of_pegs
         board_state = []
-        n_pegs = board._n_pegs
+        n_pegs = board.n_pegs
         for peg in rows_of_pegs[active_row]:
-            board_state.append(peg._color)
+            board_state.append(peg.color)
 
-        if self._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
-            if board_state != [(255, 255, 255) for _ in range(n_pegs)] != winning_pegs:
+        x, y = mouse_cords
+        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
+        if self._rect.collidepoint(x, y) and lmb and rmb:
+            if board_state != [colors["white"] for _ in range(n_pegs)] != winning_pegs:
                 if board_state == winning_pegs:
                     board.change_message("win")
                     data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac

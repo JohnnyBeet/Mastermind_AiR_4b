@@ -2,7 +2,8 @@ from src.game_classes import Button, GFXEntity
 import pygame.freetype
 import pygame.gfxdraw
 from src.game_classes import data
-from src.settings_loading import game_configs
+from src.settings_loading import game_configs, menu_button_configs, colors
+
 AVAILABLE_CODE_LENGHTS = [str(i) for i in range(3, 7)]
 AVAILABLE_DIFFICULTY_LVLS = ["easy", "normal", "hard", "master"]
 
@@ -15,8 +16,7 @@ class TriangularButton(Button):
         self.orientation = orientation  # left or right
 
     def draw(self):
-        x = self._pos[0]
-        y = self._pos[1]
+        x, y = self._pos
         a = int(self.side / 2)
         y_offset = self.side
         x_offset = int(a * 1.73)
@@ -51,9 +51,12 @@ class Display(GFXEntity):
 
     default_offset = 0
     value_index = 0
+    button_color = (200, 0, 0)
+    button_side = 50
+    button_gap = 100
 
     def __init__(self, pos, size, color, window, values, font=game_configs["font_path"], display_size=(60, 120),
-                 font_size=30, font_color=(255, 255, 255)):
+                 font_size=30, font_color=colors["white"]):
         super().__init__(pos, color, window, size)
         self.displayable_values = values
         self.displayed_value = values[0]
@@ -61,8 +64,11 @@ class Display(GFXEntity):
         self.font = pygame.freetype.Font(font, font_size)
         self.font_color = font_color
         self.display_size = display_size
-        self.left_button = TriangularButton((pos[0] - 100, pos[1]), (200, 0, 0), window, 50, "left")
-        self.right_button = TriangularButton((pos[0] + 100, pos[1]), (200, 0, 0), window, 50, "right")
+        x, y = pos
+        self.left_button = TriangularButton((x - self.button_gap, y), self.button_color, window, self.button_side,
+                                            "left")
+        self.right_button = TriangularButton((x + self.button_gap, y), self.button_color, window, self.button_side,
+                                             "right")
 
     @property
     def offset(self):
@@ -74,7 +80,8 @@ class Display(GFXEntity):
 
     @property
     def display_pos(self):
-        return self._pos[0] + self.offset, self._pos[1] + 15
+        x, y = self._pos
+        return x + self.offset, y + 15
 
     @property
     def display_rect(self):
@@ -82,12 +89,14 @@ class Display(GFXEntity):
 
     def change_value(self, mouse_cords: list, clicked: list) -> list:
         """ Zmienia wartość wyświetlanej wartości zmiennej """
-        if self.left_button._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
+        x, y = mouse_cords
+        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
+        if self.left_button.get_rect().collidepoint(x, y) and lmb and rmb:
             self.value_index = self.left_button.change_value(self.value_index, self.values_range)
             self.displayed_value = self.displayable_values[self.value_index]
             clicked = [False, True]
 
-        if self.right_button._rect.collidepoint(mouse_cords[0], mouse_cords[1]) and clicked[0] and clicked[1]:
+        if self.right_button.get_rect().collidepoint(x, y) and lmb and rmb:
             self.value_index = self.right_button.change_value(self.value_index, self.values_range)
             self.displayed_value = self.displayable_values[self.value_index]
             clicked = [False, True]
@@ -103,13 +112,21 @@ class Display(GFXEntity):
 
 class GameSettingMenu(GFXEntity):
     """ Klasa menu wyboru długości zgadywanego kodu oraz poziomu trudności gry """
+
+    display_size = (200, 80)
+    x_offset = 290
+    y_offset = 120
+    another_display_offset = 160
+
     def __init__(self, pos, color, window, size):
         super().__init__(pos, color, window, size)
-        self.code_lenght_display = Display((pos[0] + 290, pos[1] + 120), (200, 80),
+        x, y = pos
+        self.code_lenght_display = Display((x + self.x_offset, y + self.y_offset), self.display_size,
                                            color, window, AVAILABLE_CODE_LENGHTS)
-        self.difficulty_display = Display((pos[0] + 290, pos[1] + 280), (200, 80),
-                                          color, window, AVAILABLE_DIFFICULTY_LVLS, -30)
-        self.button = Button((260, 550), (0, 100, 0), self._window, (260, 80))
+        self.difficulty_display = Display((x + self.x_offset, y + self.y_offset + self.another_display_offset),
+                                          self.display_size, color, window, AVAILABLE_DIFFICULTY_LVLS)
+        self.button = Button(menu_button_configs["pos"], menu_button_configs["color"],
+                             self._window, menu_button_configs["size"])
 
     def draw(self):
         super(GameSettingMenu, self).draw()
