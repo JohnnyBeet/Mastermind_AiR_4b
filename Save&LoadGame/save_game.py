@@ -17,10 +17,10 @@ class SaveData:
         self.n_pegs = n_pegs_
         self.level = lev
         self.colors = state_tab
-        with open('save.json', 'w') as outfile:
+        with open('Save&LoadGame/save.txt', 'w') as outfile:
             json.dump(self.__dict__, outfile)
           
     def load_game(self):
-        with open('save.json','r') as file:
+        with open('Save&LoadGame/save.txt', 'r') as file:
             self.__dict__ = json.load(file)
         # tutaj nalezy wywolac plansze z odpowiednimi danymi przechowywanymi w tej klasie
