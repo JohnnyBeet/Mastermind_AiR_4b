@@ -1,130 +1,33 @@
 {
     "colors": {
-        "white": [
-            255,
-            255,
-            255
-        ],
-        "red": [
-            255,
-            0,
-            0
-        ],
-        "green": [
-            0,
-            255,
-            0
-        ],
-        "blue": [
-            0,
-            0,
-            255
-        ],
-        "yellow": [
-            255,
-            255,
-            0
-        ],
-        "purple": [
-            200,
-            0,
-            255
-        ],
-        "aqua": [
-            0,
-            255,
-            255
-        ],
-        "black": [
-            0,
-            0,
-            0
-        ]
+        "white": [255, 255, 255],
+        "red": [255, 0, 0],
+        "green": [0, 255, 0],
+        "blue": [0, 0, 255],
+        "yellow": [255, 255, 0],
+        "purple": [200, 0, 255],
+        "aqua": [0, 255, 255],
+        "black": [0, 0, 0],
     },
     "gamesettings": {
-        "screen_size": [
-            800,
-            900
-        ],
+        "screen_size": [800, 900],
         "display_caption": "Mastermind",
         "font_path": "gfx/ARCADECLASSIC.ttf",
-        "font_size": 18
+        "font_size": 18,
     },
-    "menu": {
-        "pos": [
-            100,
-            100
-        ],
-        "size": [
-            600,
-            600
-        ]
-    },
-    "board": {
-        "pos": [
-            100,
-            20
-        ],
-        "size": [
-            600,
-            850
-        ],
-        "color": [
-            100,
-            200,
-            100
-        ]
-    },
+    "menu": {"pos": [100, 100], "size": [600, 600]},
+    "board": {"pos": [100, 20], "size": [600, 850], "color": [100, 200, 100]},
     "logbox": {
-        "pos": [
-            210,
-            700
-        ],
-        "size": [
-            350,
-            100
-        ],
-        "text_color": [
-            255,
-            255,
-            255
-        ],
-        "background_color": [
-            0,
-            0,
-            0
-        ],
-        "number_of_messages_displayed": 4
+        "pos": [210, 700],
+        "size": [350, 100],
+        "text_color": [255, 255, 255],
+        "background_color": [0, 0, 0],
+        "number_of_messages_displayed": 4,
     },
     "GameSettingMenuButton": {
-        "pos": [
-            260,
-            550
-        ],
-        "color": [
-            0,
-            100,
-            0
-        ],
-        "size": [
-            260,
-            80
-        ]
+        "pos": [260, 550],
+        "color": [0, 100, 0],
+        "size": [260, 80],
     },
-    "checkbutton": {
-        "pos": [
-            300,
-            645
-        ],
-        "color": [
-            255,
-              0,
-            100
-        ],
-        "size": [
-            200,
-             50
-        ]
-
-    }
+    "checkbutton": {"pos": [300, 645], "color": [255, 0, 100], "size": [200, 50]},
 }
