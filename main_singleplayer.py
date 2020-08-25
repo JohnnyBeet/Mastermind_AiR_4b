@@ -2,7 +2,13 @@ import pygame.freetype
 from src.game_classes import Board
 from src.logbox import LogBox
 from src.game_setting import GameSettingMenu
-from src.settings_loading import colors, game_configs, menu_configs, board_configs, logbox_configs
+from src.settings_loading import (
+    colors,
+    game_configs,
+    menu_configs,
+    board_configs,
+    logbox_configs,
+)
 import sys
 
 
@@ -14,18 +20,22 @@ def play_game():
     screen_size = game_configs["screen_size"]
     background = colors["black"]
     pygame.display.set_caption(game_configs["display_caption"])
-    game_font = pygame.freetype.Font(game_configs["font_path"], game_configs["font_size"])
+    game_font = pygame.freetype.Font(
+        game_configs["font_path"], game_configs["font_size"]
+    )
     screen = pygame.display.set_mode(screen_size)
 
     peg_num = None
     row_num = None
 
-    menu = GameSettingMenu(menu_configs["pos"], colors["aqua"], screen, menu_configs["size"])
+    menu = GameSettingMenu(
+        menu_configs["pos"], colors["aqua"], screen, menu_configs["size"]
+    )
     menu.draw()  # pygame.Rect trójkątnych przycisków pojawiają się dopiero po narysowaniu
     clickable_rects = menu.get_rects()
     mouse_logic_list = [False, True]
 
-    while not(peg_num and row_num):
+    while not (peg_num and row_num):
         """ Pętla menu wyboru parametrów gry """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -54,11 +64,27 @@ def play_game():
             peg_num, row_num = menu.return_game_settings()
             pygame.display.flip()
 
-    board = Board(board_configs["pos"], board_configs["size"], board_configs["color"], screen, peg_num, row_num)
-    logbox = LogBox(logbox_configs["pos"], logbox_configs["size"], logbox_configs["background_color"],
-                    logbox_configs["text_color"], screen, logbox_configs["number_of_messages_displayed"])
+    board = Board(
+        board_configs["pos"],
+        board_configs["size"],
+        board_configs["color"],
+        screen,
+        peg_num,
+        row_num,
+    )
+    logbox = LogBox(
+        logbox_configs["pos"],
+        logbox_configs["size"],
+        logbox_configs["background_color"],
+        logbox_configs["text_color"],
+        screen,
+        logbox_configs["number_of_messages_displayed"],
+    )
     clickable_rects = board.get_rects()
-    mouse_logic_list = [False, True]  # [ LPM został wciśnięty , LPM został wciśnięty a później opuszczony ]
+    mouse_logic_list = [
+        False,
+        True,
+    ]  # [ LPM został wciśnięty , LPM został wciśnięty a później opuszczony ]
     end_game = False
 
     while True:
@@ -89,9 +115,11 @@ def play_game():
         screen.fill(background)
         board.draw()
         mouse_logic_list = board.interact(pygame.mouse.get_pos(), mouse_logic_list)
-        mouse_logic_list = board.button.click_button(board, pygame.mouse.get_pos(), mouse_logic_list)
+        mouse_logic_list = board.button.click_button(
+            board, pygame.mouse.get_pos(), mouse_logic_list
+        )
         logbox.load_text(board.get_message())
         logbox.print_text(game_font)
         lmb, rmb = mouse_logic_list
-        end_game = not(lmb or rmb)  # po wygraniu gra sie konczy po jednym LPM
+        end_game = not (lmb or rmb)  # po wygraniu gra sie konczy po jednym LPM
         pygame.display.flip()

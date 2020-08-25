@@ -11,7 +11,10 @@ data.load_stats()  # wczytuje poprzednie statystyki, zeby ich nie utracic
 
 class GFXEntity(ABC):
     """ Klasa macierzysta zawierająca podstawowe parametry obiektu graficznego w pygame """
-    def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size: tuple = (0, 0)):
+
+    def __init__(
+        self, pos: tuple, color: tuple, window: pygame.Surface, size: tuple = (0, 0)
+    ):
         self._pos = pos  # (x, y)
         self._color = color  # (R, G, B)
         self._size = size  # (długość, wysokość)
@@ -28,10 +31,13 @@ class Peg(GFXEntity):
     _state = 0
 
     """ Klasa kołka/kamyczka (w zależności od interpretacji wizualnej) """
+
     def __init__(self, pos: tuple, color: tuple, radius: int, window: pygame.Surface):
         super().__init__(pos, color, window)
         self._radius = radius
-        self._rect = pygame.draw.circle(self._window, self._color, self._pos, self._radius)
+        self._rect = pygame.draw.circle(
+            self._window, self._color, self._pos, self._radius
+        )
 
     def draw(self):
         """ Rysuje kołek w wskazanym oknie """
@@ -70,23 +76,34 @@ class Board(GFXEntity):
 
     active_row = 0
     x, y = game_configs["screen_size"]
-    change_x_base, change_y_base = x - 200, y - 350  # gra w małych rozdzielczościach nie jest wskazana
+    change_x_base, change_y_base = (
+        x - 200,
+        y - 350,
+    )  # gra w małych rozdzielczościach nie jest wskazana
     base_peg_x, base_peg_y = 150, 100
 
-    def __init__(self, pos: tuple, size: tuple, color: tuple, window: pygame.Surface, n_pegs: int, rows: int):
+    def __init__(
+        self,
+        pos: tuple,
+        size: tuple,
+        color: tuple,
+        window: pygame.Surface,
+        n_pegs: int,
+        rows: int,
+    ):
         super().__init__(pos, color, window, size)
         self._n_pegs = n_pegs
         self.n_rows = rows
 
         """ Skalowanie rozmiaru kołków na planszy w zależności od ich ilości """
-        self.scaling_coeff = 5 - rows/n_pegs
-        self.peg_offset_x = 50 + (3-n_pegs) * 20
+        self.scaling_coeff = 5 - rows / n_pegs
+        self.peg_offset_x = 50 + (3 - n_pegs) * 20
         self.peg_offset_y = round(-45 + 30 * self.scaling_coeff)
         if n_pegs >= 5 or n_pegs == 4 and rows < 12:
             self.peg_offset_y -= 50
-        self.change_x = self.change_x_base/n_pegs
-        self.change_y = self.change_y_base/rows
-        self.peg_size = self.scaling_coeff * self.change_x/14
+        self.change_x = self.change_x_base / n_pegs
+        self.change_y = self.change_y_base / rows
+        self.peg_size = self.scaling_coeff * self.change_x / 14
         self.peg_size = round(self.peg_size)
 
         """ Generuje ukryty kod do zgadnięcia """
@@ -103,13 +120,29 @@ class Board(GFXEntity):
         for i, row in enumerate(self.rows_of_pegs):
             if not row:
                 for j in range(self._n_pegs):
-                    self.rows_of_pegs[i].append(Peg((self.base_peg_x + self.peg_offset_x + round(self.change_x*j),
-                                                     self.base_peg_y + self.peg_offset_y + round(self.change_y*i)),
-                                                    colors["white"], self.peg_size, self._window))
+                    self.rows_of_pegs[i].append(
+                        Peg(
+                            (
+                                self.base_peg_x
+                                + self.peg_offset_x
+                                + round(self.change_x * j),
+                                self.base_peg_y
+                                + self.peg_offset_y
+                                + round(self.change_y * i),
+                            ),
+                            colors["white"],
+                            self.peg_size,
+                            self._window,
+                        )
+                    )
 
         """ Definicja przycisku na planszy """
-        self.button = CheckButton(checkbutton_configs["pos"], checkbutton_configs["color"], self._window,
-                                  checkbutton_configs["size"])
+        self.button = CheckButton(
+            checkbutton_configs["pos"],
+            checkbutton_configs["color"],
+            self._window,
+            checkbutton_configs["size"],
+        )
 
         self._message = "Rozpoczales    nowa    gre"
 
@@ -173,6 +206,7 @@ class Button(GFXEntity):
 
 class CheckButton(Button):
     """ Przycisk używany na planszy do sprawdzenia stanu gry """
+
     def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size):
         super().__init__(pos, color, window, size)
 
@@ -193,7 +227,7 @@ class CheckButton(Button):
                 if board_state == winning_pegs:
                     board.change_message("win")
                     data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
-                    data.win_percentage = (data.won_matches/data.played_matches) * 100
+                    data.win_percentage = (data.won_matches / data.played_matches) * 100
                     data.save_stats()
                     return [False, False]
                 else:
@@ -215,15 +249,19 @@ class CheckButton(Button):
                                 already_used_secret[i] = True
                                 already_used_user[j] = True
 
-                    board.change_message(f'{board.active_row+1}{" "*8}Row{" "*8}{bulls}{" "*8}bulls{" "*8}{cows}{" "*8}'
-                                         f'cows')
+                    board.change_message(
+                        f'{board.active_row+1}{" "*8}Row{" "*8}{bulls}{" "*8}bulls{" "*8}{cows}{" "*8}'
+                        f"cows"
+                    )
                     active_row += 1
                     if active_row >= board.n_rows:
                         board.change_message("lose")
                         return [False, False]
                 clicked = [False, True]
             else:
-                board.change_message("Wszystkie    pola    nie    moga    byc    puste!")
+                board.change_message(
+                    "Wszystkie    pola    nie    moga    byc    puste!"
+                )
         board.active_row = active_row
         return clicked
 
