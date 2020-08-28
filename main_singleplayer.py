@@ -34,7 +34,6 @@ def play_game():
     menu.draw()  # pygame.Rect trójkątnych przycisków pojawiają się dopiero po narysowaniu
     clickable_rects = menu.get_rects()
     mouse_logic_list = [False, True]
-
     while not (peg_num and row_num):
         """ Pętla menu wyboru parametrów gry """
         for event in pygame.event.get():

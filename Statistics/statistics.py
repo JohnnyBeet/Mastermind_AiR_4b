@@ -26,7 +26,7 @@ class Stats:
 
 class DisplayData:
     def __init__(self):
-        self.size = self.width, self.height = 640, 480
+        self.size = self.width, self.height = 1024, 576
         self.color = (128, 205, 50)
         pygame.init()
         self.board = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
@@ -40,7 +40,7 @@ class DisplayData:
                          (self.width / 2 - title.get_width() / 2, self.height / 12 - title.get_height() / 12,))
 
         # rysuje przycisk "powrot"
-        self.go_back = Button((0, 100, 200), 280, 420, 100, 40, "Powrót")
+        self.go_back = Button((0, 100, 200), 442, 420, 140, 60, "Powrót")
         self.go_back.draw(self.board)
 
         # pętla wypisująca zawartość stats.txt na ekran
@@ -75,3 +75,15 @@ class DisplayData:
                 spacer += 60
                 pygame.display.update()
         pygame.display.update()
+
+
+def display_stats():
+    pygame.init()
+    is_done = False
+    display_data = DisplayData()
+    while not is_done:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if display_data.go_back.is_pointing(pos):
+                    is_done = True

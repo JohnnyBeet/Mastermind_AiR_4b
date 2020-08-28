@@ -4,6 +4,7 @@
 # from Menu.Buttons import Button
 from Statistics.statistics import *
 import os
+from Instructions.instructions import *
 
 # zmiana katalogu roboczego na "Mastermind_AiR_4b"
 path_parent = os.path.dirname(os.getcwd())
@@ -17,7 +18,7 @@ class Menu:
     """ Główne menu gry """
     def __init__(self):
         self.display_surf = None
-        self.size = self.width, self.height = 640, 400
+        self.size = self.width, self.height = 1024, 576
         self.color = (255, 192, 203)
 
         pygame.init()
@@ -28,28 +29,28 @@ class Menu:
 
         # rysuje tytuł
         self.title = "MASTERMIND"
-        font = pygame.font.SysFont('comicsans', 52)
+        font = pygame.font.SysFont('comicsans', 62)
         title = font.render(self.title, 1, (47, 23, 56))
-        self.display_surf.blit(title, (self.width/2 - title.get_width()/2, self.height/5 - title.get_height()/5,))
+        self.display_surf.blit(title, (self.width/2 - title.get_width()/2, self.height/6 - title.get_height()/6,))
 
         # rysuje przycisk "Nowa gra"
-        self.new_g = Button((0, 100, 200), 280, 140, 100, 40, "New Game")
+        self.new_g = Button((0, 100, 200), 442, 160, 140, 60, "New Game")
         self.new_g.draw(self.display_surf)
 
         # rysuje przycisk "Wczytaj"
-        self.load = Button((0, 100, 200), 280, 190, 100, 40, "Load Game")
+        self.load = Button((0, 100, 200), 442, 230, 140, 60, "Load Game")
         self.load.draw(self.display_surf)
 
         # rysuje przycisk "Statystyki"
-        self.stats = Button((0, 100, 200), 280, 240, 100, 40, "High Scores")
+        self.stats = Button((0, 100, 200), 442, 300, 140, 60, "High Scores")
         self.stats.draw(self.display_surf)
 
         # rysuje przycisk "Manuel :P"
-        self.info = Button((0, 100, 200), 280, 290, 100, 40, "Instructions")
+        self.info = Button((0, 100, 200), 442, 370, 140, 60, "Instructions")
         self.info.draw(self.display_surf)
 
         # rysuje przycisk "Wyjscie"
-        self.esc = Button((0, 100, 200), 280, 340, 100, 40, "Exit")
+        self.esc = Button((0, 100, 200), 442, 440, 140, 60, "Exit")
         self.esc.draw(self.display_surf)
 
         pygame.display.update()
@@ -70,12 +71,12 @@ def main():
                 if menu.esc.is_pointing(pos):
                     is_running = False
                 elif menu.stats.is_pointing(pos):
-                    json_data = Stats()
-                    json_data.load_stats()
-                    settings = DisplayData()
+                    settings = display_stats()
+                    menu = Menu()
                 elif menu.new_g.is_pointing(pos):
                     main_singleplayer.play_game()
-                elif settings.go_back.is_pointing(pos):
+                elif menu.info.is_pointing(pos):
+                    info = display_instructions()
                     menu = Menu()
 
 
