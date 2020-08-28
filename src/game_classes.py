@@ -227,7 +227,7 @@ class CheckButton(Button):
                 if board_state == winning_pegs:
                     board.change_message("win")
                     data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
-                    data.win_percentage = int((data.won_matches / data.played_matches) * 100)
+                    data.win_percentage = round((data.won_matches / data.played_matches) * 100)
                     data.save_stats()
                     return [False, False]
                 else:

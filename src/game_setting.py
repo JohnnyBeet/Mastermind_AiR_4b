@@ -200,7 +200,7 @@ class GameSettingMenu(GFXEntity):
             }
             diff_lvl = available_diff_lvls[self.difficulty_display.displayed_value]
             data.played_matches += 1  # nie wiedziałem gdzie to dac poki co dziala tak jak chce
-            data.win_percentage = (data.won_matches/data.played_matches) * 100
+            data.win_percentage = round((data.won_matches/data.played_matches) * 100)
             data.save_stats()
             return code_lenght, diff_lvl
         else:
