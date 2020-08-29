@@ -1,5 +1,5 @@
 import pygame.freetype
-from src.game_classes import Board
+from src.game_classes import Board, data
 from src.logbox import LogBox
 from src.game_setting import GameSettingMenu
 from src.settings_loading import (
@@ -12,7 +12,7 @@ from src.settings_loading import (
 import sys
 
 # TODO: wybór trybu gry można dokonywać w menu głównym po wciśnieciu new game
-gamemode = 'Letter'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
+gamemode = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
 
 
 def play_game():
@@ -65,6 +65,18 @@ def play_game():
             mouse_logic_list = menu.check(pygame.mouse.get_pos(), mouse_logic_list)
             peg_num, row_num = menu.return_game_settings()
             pygame.display.flip()
+
+    # dwa ify zapisujące statystyki rozegranych meczy w obu trybach
+    if gamemode == "Letter":
+        data.played_matches += 1
+        data.win_percentage = round((data.won_matches / data.played_matches) * 100)
+        data.word_version += 1
+        data.save_stats()
+    elif gamemode == "Peg":
+        data.played_matches += 1
+        data.win_percentage = round((data.won_matches / data.played_matches) * 100)
+        data.normal_mastermind += 1
+        data.save_stats()
 
     board = Board(
         board_configs["pos"],

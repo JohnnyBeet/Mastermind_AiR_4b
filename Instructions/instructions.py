@@ -16,17 +16,17 @@ class TutorialScreen:
         self.previous = None
 
         # dodaje przycisk powrotu do menu
-        self.ret_menu = Button((242, 209, 107), 830, 460, 140, 60, "Menu")
+        self.ret_menu = Button((242, 209, 107), 830, 460, 140, 60, 24, "Menu")
         self.ret_menu.draw(self.screen)
         pygame.display.update()
 
     def add_next_button(self, pos: tuple):
-        self.next = Button((242, 209, 107), pos[0], pos[1], 140, 60, "Dalej")
+        self.next = Button((242, 209, 107), pos[0], pos[1], 140, 60, 24, "Dalej")
         self.next.draw(self.screen)
         pygame.display.update()
 
     def add_previous_button(self, pos: tuple):
-        self.previous = Button((242, 209, 107), pos[0], pos[1], 140, 60, "Wstecz")
+        self.previous = Button((242, 209, 107), pos[0], pos[1], 140, 60, 24, "Wstecz")
         self.previous.draw(self.screen)
         pygame.display.update()
 

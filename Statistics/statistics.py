@@ -40,7 +40,7 @@ class DisplayData:
                          (self.width / 2 - title.get_width() / 2, self.height / 12 - title.get_height() / 12,))
 
         # rysuje przycisk "powrot"
-        self.go_back = Button((0, 100, 200), 442, 420, 140, 60, "Powrót")
+        self.go_back = Button((0, 100, 200), 442, 420, 140, 60, 24, "Powrót")
         self.go_back.draw(self.board)
 
         # pętla wypisująca zawartość stats.txt na ekran

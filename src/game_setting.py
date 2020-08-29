@@ -1,7 +1,6 @@
 from src.game_classes import Button, GFXEntity
 import pygame.freetype
 import pygame.gfxdraw
-from src.game_classes import data
 from src.settings_loading import game_configs, menu_button_configs, colors
 
 AVAILABLE_CODE_LENGHTS = [str(i) for i in range(3, 7)]
@@ -199,9 +198,6 @@ class GameSettingMenu(GFXEntity):
                 "master": code_lenght,
             }
             diff_lvl = available_diff_lvls[self.difficulty_display.displayed_value]
-            data.played_matches += 1  # nie wiedziałem gdzie to dac poki co dziala tak jak chce
-            data.win_percentage = round((data.won_matches/data.played_matches) * 100)
-            data.save_stats()
             return code_lenght, diff_lvl
         else:
             return None, None

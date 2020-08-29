@@ -208,7 +208,6 @@ class Board(GFXEntity):
                     if j == k:
                         self.winning_pegs.append(colors[key])
                         break
-
             """ Wypełnia pola w planszy białymi kołkami. """
             self.rows_of_pegs = [[] for _ in range(rows)]
             for i, row in enumerate(self.rows_of_pegs):
@@ -348,15 +347,14 @@ class CheckButton(Button):
 
     def click_button(self, board: Board, mouse_cords: tuple, clicked: tuple) -> list:
         """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu. """
-        pegs_or_letters = Board.type
+        pegs_or_letters = board.type
         active_row = board.active_row
         winning_pegs = board.winning_pegs
         rows_of_pegs = board.rows_of_pegs
         n_pegs = board.n_pegs
         board_state = [
-            item.color if pegs_or_letters == "Peg" else item.value for item in rows_of_pegs[active_row]
+            item.color if pegs_or_letters == "Peg" else item.value if pegs_or_letters == "Letter" else [] for item in rows_of_pegs[active_row]
         ]
-
         x, y = mouse_cords
         lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
         if self._rect.collidepoint(x, y) and lmb and rmb:
