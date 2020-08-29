@@ -1,8 +1,10 @@
 import pygame
+import pygame.freetype
 import random
 import Statistics.statistics as stat
 from abc import ABC
 from src.settings_loading import colors, checkbutton_configs, game_configs
+from string import ascii_lowercase as allowed_characters
 
 """ data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
 data = stat.Stats()
@@ -71,6 +73,95 @@ class Peg(GFXEntity):
         return self._rect
 
 
+class Letter(GFXEntity):
+
+    _state = 0
+
+    def __init__(
+        self,
+        pos: tuple,
+        color: tuple,
+        window: pygame.Surface,
+        size: tuple,
+        value,
+        font_color: tuple,
+        font_size=24,
+        font_path="gfx/ARCADECLASSIC.TTF",
+    ):
+        super().__init__(pos, color, window, size)
+        self._value = value  # obecnie wyświetlana literka
+        self._font_color = font_color
+        self._font_size = font_size
+        self._font_path = font_path
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+    @value.setter
+    def value(self, change: str):
+        """ Zmienia wartość literki - z np. 'a' na 'b'  na żądanie """
+        if len(change) == 1 and change.lower() in allowed_characters:
+            self._value = change.lower()
+        else:
+            raise TypeError("Oczekiwaliśmy pojedyńczej literki!")
+
+    @property
+    def font_size(self):
+        return self._font_size
+
+    @font_size.setter
+    def font_size(self, new_size: int):
+        """ Myślę że może się przydać przy jakimś skalowaniu planszy - ewentulnie się to usunie """
+        if isinstance(new_size, int) and 4 <= new_size <= 40:
+            self._font_size = new_size
+        else:
+            raise TypeError("Rozmiar czcionki wydaje się być nieprawidłowy!")
+
+    @property
+    def font_path(self) -> str:
+        return self._font_path
+
+    @property
+    def font_color(self) -> tuple:
+        return self._font_color
+
+    @property
+    def font(self) -> pygame.freetype.Font:
+        return pygame.freetype.Font(self._font_path, self._font_size)
+
+    @property
+    def rect(self) -> pygame.Rect:
+        return pygame.Rect(self._pos, self._size).copy()
+
+    def draw(self):
+        """ Rysuje literkę """
+        GFXEntity.draw(self)
+        self.font.render_to(self._window, self._rect, self._value, self._font_color)
+
+    def change(self, mouse_cords: list, clicked: list) -> list:
+        """ Metoda służy do zmieniania wartości literki.
+            Zwraca listę z wartościami boolowskimi, które są używane
+            w niezawodnym systemie wprowadzania informacji z myszki
+        """
+
+        # TODO: zmienić na input z klawiatury
+        for i, value in enumerate(allowed_characters):
+            if i == self._state:
+                self._value = value
+                if i == len(allowed_characters) - 1:
+                    self._state = 0
+                break
+
+        x, y = mouse_cords
+        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
+        if self._rect.collidepoint(x, y) and lmb and rmb:
+            self._state += 1  # TODO: zamiast zmieniać stan literki to będzie tutaj wprowadzana nowa wartość
+            clicked = [False, True]
+
+        return clicked
+
+
 class Board(GFXEntity):
     """ Klasa planszy """
 
@@ -90,10 +181,12 @@ class Board(GFXEntity):
         window: pygame.Surface,
         n_pegs: int,
         rows: int,
+        _type: str,
     ):
         super().__init__(pos, color, window, size)
         self._n_pegs = n_pegs
         self.n_rows = rows
+        self._type = _type
 
         """ Skalowanie rozmiaru kołków na planszy w zależności od ich ilości """
         self.scaling_coeff = 5 - rows / n_pegs
@@ -106,35 +199,73 @@ class Board(GFXEntity):
         self.peg_size = self.scaling_coeff * self.change_x / 14
         self.peg_size = round(self.peg_size)
 
-        """ Generuje ukryty kod do zgadnięcia """
-        self.winning_pegs = []
-        for i in range(n_pegs):
-            k = random.randint(0, len(colors) - 2)
-            for j, key in enumerate(colors):
-                if j == k:
-                    self.winning_pegs.append(colors[key])
-                    break
+        if self._type == "Peg":
+            """ Generuje ukryty kod do zgadnięcia """
+            self.winning_pegs = []
+            for i in range(n_pegs):
+                k = random.randint(0, len(colors) - 2)
+                for j, key in enumerate(colors):
+                    if j == k:
+                        self.winning_pegs.append(colors[key])
+                        break
 
-        """ Wypełnia pola w planszy białymi kołkami. """
-        self.rows_of_pegs = [[] for _ in range(rows)]
-        for i, row in enumerate(self.rows_of_pegs):
-            if not row:
-                for j in range(self._n_pegs):
-                    self.rows_of_pegs[i].append(
-                        Peg(
-                            (
-                                self.base_peg_x
-                                + self.peg_offset_x
-                                + round(self.change_x * j),
-                                self.base_peg_y
-                                + self.peg_offset_y
-                                + round(self.change_y * i),
-                            ),
-                            colors["white"],
-                            self.peg_size,
-                            self._window,
+            """ Wypełnia pola w planszy białymi kołkami. """
+            self.rows_of_pegs = [[] for _ in range(rows)]
+            for i, row in enumerate(self.rows_of_pegs):
+                if not row:
+                    for j in range(self._n_pegs):
+                        self.rows_of_pegs[i].append(
+                            Peg(
+                                (
+                                    self.base_peg_x
+                                    + self.peg_offset_x
+                                    + round(self.change_x * j),
+                                    self.base_peg_y
+                                    + self.peg_offset_y
+                                    + round(self.change_y * i),
+                                ),
+                                colors["white"],
+                                self.peg_size,
+                                self._window,
+                            )
                         )
-                    )
+        elif self._type == "Letter":
+            """ Generuje ukryty kod do zgadnięcia """
+
+            n_pegs_to_str = {3: "three", 4: "four", 5: "five", 6: "six"}
+
+            def random_line(afile):
+                lines = open(afile).read().splitlines()
+                myline = random.choice(lines)
+                return myline
+
+            file = f"WordVersion/{n_pegs_to_str[self._n_pegs]}_letter_words.txt"
+            word = random_line(file)
+            self.winning_pegs = [letter for letter in word]
+            print(self.winning_pegs)
+
+            """ Wypełnia pola w planszy pustymi polami. """
+            self.rows_of_pegs = [[] for _ in range(rows)]
+            for i, row in enumerate(self.rows_of_pegs):
+                if not row:
+                    for j in range(self._n_pegs):
+                        self.rows_of_pegs[i].append(
+                            Letter(
+                                (
+                                    self.base_peg_x
+                                    + self.peg_offset_x
+                                    + round(self.change_x * j),
+                                    self.base_peg_y
+                                    + self.peg_offset_y
+                                    + round(self.change_y * i),
+                                ),
+                                colors["white"],
+                                self._window,
+                                (self.peg_size, self.peg_size),
+                                "_",
+                                colors["red"],
+                            )
+                        )
 
         """ Definicja przycisku na planszy """
         self.button = CheckButton(
@@ -145,6 +276,10 @@ class Board(GFXEntity):
         )
 
         self._message = "Rozpoczales    nowa    gre"
+
+    @property
+    def type(self):
+        return self._type
 
     def draw(self):
         """ Rysuje planszę wraz z kołkami w wskazanym oknie """
@@ -161,7 +296,8 @@ class Board(GFXEntity):
             clicked = peg.change(mouse_cords, clicked)
         return clicked
 
-    def get_message(self):
+    @property
+    def message(self):
         return self._message
 
     def change_message(self, condition: str):
@@ -212,13 +348,14 @@ class CheckButton(Button):
 
     def click_button(self, board: Board, mouse_cords: tuple, clicked: tuple) -> list:
         """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu. """
+        pegs_or_letters = Board.type
         active_row = board.active_row
         winning_pegs = board.winning_pegs
         rows_of_pegs = board.rows_of_pegs
-        board_state = []
         n_pegs = board.n_pegs
-        for peg in rows_of_pegs[active_row]:
-            board_state.append(peg.color)
+        board_state = [
+            item.color if pegs_or_letters == "Peg" else item.value for item in rows_of_pegs[active_row]
+        ]
 
         x, y = mouse_cords
         lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
@@ -227,7 +364,9 @@ class CheckButton(Button):
                 if board_state == winning_pegs:
                     board.change_message("win")
                     data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
-                    data.win_percentage = round((data.won_matches / data.played_matches) * 100)
+                    data.win_percentage = round(
+                        (data.won_matches / data.played_matches) * 100
+                    )
                     data.save_stats()
                     return [False, False]
                 else:

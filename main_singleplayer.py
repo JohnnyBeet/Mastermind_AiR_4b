@@ -11,6 +11,9 @@ from src.settings_loading import (
 )
 import sys
 
+# TODO: wybór trybu gry można dokonywać w menu głównym po wciśnieciu new game
+gamemode = 'Letter'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
+
 
 def play_game():
     """ Ta funkcja jest konieczna do odpalenia gry z poziomu menu, uzycie exec() na tym pliku
@@ -70,6 +73,7 @@ def play_game():
         screen,
         peg_num,
         row_num,
+        gamemode  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
     )
     logbox = LogBox(
         logbox_configs["pos"],
@@ -117,7 +121,7 @@ def play_game():
         mouse_logic_list = board.button.click_button(
             board, pygame.mouse.get_pos(), mouse_logic_list
         )
-        logbox.load_text(board.get_message())
+        logbox.load_text(board.message)
         logbox.print_text(game_font)
         lmb, rmb = mouse_logic_list
         end_game = not (lmb or rmb)  # po wygraniu gra sie konczy po jednym LPM
