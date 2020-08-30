@@ -5,6 +5,9 @@ import Statistics.statistics as stat
 from abc import ABC
 from src.settings_loading import colors, checkbutton_configs, game_configs
 from string import ascii_lowercase as allowed_characters
+from state_of_the_game.peg_mode import PegGame
+
+load_game = PegGame()
 
 """ data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
 data = stat.Stats()
@@ -185,6 +188,7 @@ class Board(GFXEntity):
     ):
         super().__init__(pos, color, window, size)
         self._n_pegs = n_pegs
+        load_game.n_pegs = n_pegs
         self.n_rows = rows
         self._type = _type
 
@@ -350,12 +354,15 @@ class CheckButton(Button):
         """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu. """
         pegs_or_letters = Board.type
         active_row = board.active_row
+        load_game.active_row = board.active_row
         winning_pegs = board.winning_pegs
         rows_of_pegs = board.rows_of_pegs
         n_pegs = board.n_pegs
         board_state = [
             item.color if pegs_or_letters == "Peg" else item.value for item in rows_of_pegs[active_row]
         ]
+
+        load_game.colors.append(board_state)
 
         x, y = mouse_cords
         lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności

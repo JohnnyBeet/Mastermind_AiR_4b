@@ -12,7 +12,8 @@ from src.settings_loading import (
 import sys
 
 # TODO: wybór trybu gry można dokonywać w menu głównym po wciśnieciu new game
-gamemode = 'Letter'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
+
+gamemode = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
 
 
 def play_game():
@@ -126,3 +127,4 @@ def play_game():
         lmb, rmb = mouse_logic_list
         end_game = not (lmb or rmb)  # po wygraniu gra sie konczy po jednym LPM
         pygame.display.flip()
+play_game()
