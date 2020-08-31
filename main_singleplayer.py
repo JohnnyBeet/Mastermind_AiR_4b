@@ -11,7 +11,6 @@ from src.settings_loading import (
 )
 import sys
 
-# TODO: wybór trybu gry można dokonywać w menu głównym po wciśnieciu new game
 gamemode = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
 
 

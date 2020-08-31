@@ -5,6 +5,7 @@ import Statistics.statistics as stat
 from abc import ABC
 from src.settings_loading import colors, checkbutton_configs, game_configs
 from string import ascii_lowercase as allowed_characters
+from keyboard_input.code_input import code_input
 
 """ data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
 data = stat.Stats()
@@ -75,8 +76,6 @@ class Peg(GFXEntity):
 
 class Letter(GFXEntity):
 
-    _state = 0
-
     def __init__(
         self,
         pos: tuple,
@@ -144,21 +143,13 @@ class Letter(GFXEntity):
             Zwraca listę z wartościami boolowskimi, które są używane
             w niezawodnym systemie wprowadzania informacji z myszki
         """
-
-        # TODO: zmienić na input z klawiatury
-        for i, value in enumerate(allowed_characters):
-            if i == self._state:
-                self._value = value
-                if i == len(allowed_characters) - 1:
-                    self._state = 0
-                break
-
         x, y = mouse_cords
         lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
         if self._rect.collidepoint(x, y) and lmb and rmb:
-            self._state += 1  # TODO: zamiast zmieniać stan literki to będzie tutaj wprowadzana nowa wartość
+            new_value = code_input(self._window)
+            if new_value in allowed_characters and len(new_value) == 1:
+                self._value = new_value
             clicked = [False, True]
-
         return clicked
 
 
@@ -309,7 +300,7 @@ class Board(GFXEntity):
 
     def get_rects(self):
         """ Zwraca obiekty typu rect potrzebne to sprawdzania kolizji z myszką """
-        rects = [self.button.get_rect()]
+        rects = [self.button.rect]
         for row in self.rows_of_pegs:
             for peg in row:
                 rects.append(peg.rect.copy())
@@ -353,7 +344,8 @@ class CheckButton(Button):
         rows_of_pegs = board.rows_of_pegs
         n_pegs = board.n_pegs
         board_state = [
-            item.color if pegs_or_letters == "Peg" else item.value if pegs_or_letters == "Letter" else [] for item in rows_of_pegs[active_row]
+            item.color if pegs_or_letters == "Peg" else item.value if pegs_or_letters == "Letter"
+            else [] for item in rows_of_pegs[active_row]
         ]
         x, y = mouse_cords
         lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
@@ -402,6 +394,7 @@ class CheckButton(Button):
         board.active_row = active_row
         return clicked
 
-    def get_rect(self):
+    @property
+    def rect(self):
         """ Zwraca obiekt typu rect potrzebny to sprawdzania kolizji z myszką """
         return self._rect.copy()
