@@ -70,7 +70,7 @@ class Display(GFXEntity):
         color,
         window,
         values,
-        font=game_configs["font_path"],
+        font=game_configs["font_path"],  # ścieżka dostępu do pliku używanej czcionki
         display_size=(60, 120),
         font_size=30,
         font_color=colors["white"],
@@ -147,10 +147,10 @@ class Display(GFXEntity):
 class GameSettingMenu(GFXEntity):
     """ Klasa menu wyboru długości zgadywanego kodu oraz poziomu trudności gry """
 
-    display_size = (200, 80)
-    x_offset = 290
-    y_offset = 120
-    another_display_offset = 160
+    display_size = 200, 80  # rozmiar pojedyńczego interfejsu
+    x_offset = 290  # bazowy odstęp od lewej krawędzi menu
+    y_offset = 120  # bazowy odstęp od górnej krawędzi menu
+    another_display_offset = 160  # odstęp osi y pomiędzy interfejsami ustawień gry
 
     def __init__(self, pos, color, window, size):
         super().__init__(pos, color, window, size)
@@ -177,12 +177,15 @@ class GameSettingMenu(GFXEntity):
         )
 
     def draw(self):
+        """ Rusyje menu wraz z interfejsem ustawień gry """
         super(GameSettingMenu, self).draw()
         self.code_lenght_display.draw()
         self.difficulty_display.draw()
         self.button.draw()
 
     def check(self, mouse_cords, clicked) -> list:
+        """ Sprawdza po kolei czy użytkownik zmieniał ustawienia długości kodu, następnie ustawienia poziomu trudności
+        i ostatecznie sprawdza czy te zmiany zostały zatwierdzone """
         clicked = self.code_lenght_display.change_value(mouse_cords, clicked)
         clicked = self.difficulty_display.change_value(mouse_cords, clicked)
         clicked = self.button.interact(mouse_cords, clicked)
@@ -202,7 +205,8 @@ class GameSettingMenu(GFXEntity):
         else:
             return None, None
 
-    def get_rects(self):
+    @property
+    def rects(self):
         """ Zwraca obiekty typu rect potrzebne to sprawdzania kolizji z myszką """
         rects = [
             self.button._rect.copy(),

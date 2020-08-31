@@ -180,6 +180,7 @@ class CodeInput:
 
 
 def code_input(screen: pygame.Surface) -> str:
+    """ Umożliwia wprowadzenie danych z klawiatury """
     user_input = CodeInput()
     run = True
     while run:
@@ -190,7 +191,7 @@ def code_input(screen: pygame.Surface) -> str:
                 exit()
 
         user_input.update(events)
-        if user_input.get_text():
+        if user_input.get_text():  # po wprowadzeniu pierwszej literki zamyka funkcję i zwraca input
             run = False
 
     return user_input.get_text()

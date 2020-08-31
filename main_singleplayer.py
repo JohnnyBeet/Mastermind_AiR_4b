@@ -34,7 +34,7 @@ def play_game():
         menu_configs["pos"], colors["aqua"], screen, menu_configs["size"]
     )
     menu.draw()  # pygame.Rect trójkątnych przycisków pojawiają się dopiero po narysowaniu
-    clickable_rects = menu.get_rects()
+    clickable_rects = menu.rects
     mouse_logic_list = [False, True]
     while not (peg_num and row_num):
         """ Pętla menu wyboru parametrów gry """
@@ -94,7 +94,7 @@ def play_game():
         screen,
         logbox_configs["number_of_messages_displayed"],
     )
-    clickable_rects = board.get_rects()
+    clickable_rects = board.rects
     mouse_logic_list = [
         False,
         True,
@@ -128,7 +128,7 @@ def play_game():
 
         screen.fill(background)
         board.draw()
-        mouse_logic_list = board.interact(pygame.mouse.get_pos(), mouse_logic_list)
+        mouse_logic_list = board.change(pygame.mouse.get_pos(), mouse_logic_list)
         mouse_logic_list = board.button.click_button(
             board, pygame.mouse.get_pos(), mouse_logic_list
         )
