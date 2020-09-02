@@ -80,7 +80,7 @@ class ChooseGame:
         self.word = Button((0, 100, 200), 628, 228, 280, 120, 34, "Tryb Słowny")
         self.word.draw(self.background)
 
-        # rysuje przycisk trybu słownego
+        # rysuje przycisk powrotu do menu
         self.back = Button((0, 100, 200), 442, 428, 140, 60, 24, "Powrót")
         self.back.draw(self.background)
 
