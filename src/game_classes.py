@@ -2,7 +2,7 @@ import pygame
 import pygame.freetype
 import random
 import Statistics.statistics as stat
-import Save&LoadGame.save_game 
+import Save&LoadGame.save_game as gamestate
 from abc import ABC
 from src.settings_loading import colors, checkbutton_configs, game_configs
 from string import ascii_lowercase as allowed_characters
@@ -393,9 +393,8 @@ class CheckButton(Button):
                         f'{board.active_row+1}{" "*8}Row{" "*8}{bulls}{" "*8}bulls{" "*8}{cows}{" "*8}'
                         f"cows"
                     )
+                    SaveData.save_game( board_state, board.active_row, board.n_pegs )
                     active_row += 1
-                    SaveData.save_game( board_state, board.active_row, #znaleźć poziom 
-                                       ,board.n_pegs )
                     if active_row >= board.n_rows:
                         board.change_message("lose")
                         return [False, False]
