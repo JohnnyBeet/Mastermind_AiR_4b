@@ -18,7 +18,7 @@ class SaveData:
         with open('Save&LoadGame/save.txt', 'w') as outfile:
             json.dump(self.__dict__, outfile)
        
-    def clean_saved_game(self)
+    def delete_savedgame(self)
          with open('Save&LoadGame/save.txt', 'r') as file:
             b= json.load(file)
           del b  
