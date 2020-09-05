@@ -2,10 +2,10 @@ import pygame
 import pygame.freetype
 import random
 import Statistics.statistics as stat
+import Save&LoadGame.save_game as gamestate
 from abc import ABC
 from src.settings_loading import colors, checkbutton_configs, game_configs
 from string import ascii_lowercase as allowed_characters
-from keyboard_input.code_input import code_input
 
 """ data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
 data = stat.Stats()
@@ -76,29 +76,24 @@ class Peg(GFXEntity):
 
 class Letter(GFXEntity):
 
+    _state = 0
+
     def __init__(
         self,
         pos: tuple,
         color: tuple,
         window: pygame.Surface,
-        radius: int,
+        size: tuple,
         value,
         font_color: tuple,
         font_size=24,
         font_path="gfx/ARCADECLASSIC.TTF",
     ):
-        super().__init__(pos, color, window)
+        super().__init__(pos, color, window, size)
         self._value = value  # obecnie wyświetlana literka
         self._font_color = font_color
         self._font_size = font_size
         self._font_path = font_path
-        self._radius = radius # promień okręgu wokół literki
-        # TODO: pozycja liter również mogłaby się skalować wraz z ich rozmiarem aby nie wychodzić poza białe koło
-        self._letter_pos = self._pos[0] - round(self._radius / 2), self._pos[1] - round(self._radius / 2)
-        self._letter_rect = pygame.Rect(self._letter_pos, (self._radius, self._radius))
-        self._click_rect = pygame.draw.circle(self._window, self._color, self._pos, self._radius).union(
-            self._letter_rect.copy()  # rect obejmujący zarówno rect litery jak i białego pola
-        )
 
     @property
     def value(self) -> str:
@@ -138,25 +133,33 @@ class Letter(GFXEntity):
 
     @property
     def rect(self) -> pygame.Rect:
-        return self._click_rect.copy()
+        return pygame.Rect(self._pos, self._size).copy()
 
     def draw(self):
-        """ Rysuje literkę wraz z otaczającym ją kołem """
-        pygame.draw.circle(self._window, self._color, self._pos, self._radius)
-        self.font.render_to(self._window, self._letter_rect, self._value, self._font_color)
+        """ Rysuje literkę """
+        GFXEntity.draw(self)
+        self.font.render_to(self._window, self._rect, self._value, self._font_color)
 
     def change(self, mouse_cords: list, clicked: list) -> list:
         """ Metoda służy do zmieniania wartości literki.
             Zwraca listę z wartościami boolowskimi, które są używane
             w niezawodnym systemie wprowadzania informacji z myszki
         """
+
+        # TODO: zmienić na input z klawiatury
+        for i, value in enumerate(allowed_characters):
+            if i == self._state:
+                self._value = value
+                if i == len(allowed_characters) - 1:
+                    self._state = 0
+                break
+
         x, y = mouse_cords
         lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
-        if self.rect.collidepoint(x, y) and lmb and rmb:
-            new_value = code_input(self._window)
-            if new_value in allowed_characters and len(new_value) == 1:
-                self._value = new_value
+        if self._rect.collidepoint(x, y) and lmb and rmb:
+            self._state += 1  # TODO: zamiast zmieniać stan literki to będzie tutaj wprowadzana nowa wartość
             clicked = [False, True]
+
         return clicked
 
 
@@ -173,31 +176,29 @@ class Board(GFXEntity):
 
     def __init__(
         self,
-        pos: tuple,  # pozycja x, y
-        size: tuple,  # rozmiar dlugość, szerokość
-        color: tuple,  # kolor w (R, G, B)
-        window: pygame.Surface,  # powierzchnia(okienko) na którym się będzie plansza wyświetlać
-        n_pegs: int,  # ilość elementów w rzędzie
-        rows: int,  # ilość rzędów
-        _type: str,  # typ planszy - 'Peg' albo 'Letter'
+        pos: tuple,
+        size: tuple,
+        color: tuple,
+        window: pygame.Surface,
+        n_pegs: int,
+        rows: int,
+        _type: str,
     ):
         super().__init__(pos, color, window, size)
         self._n_pegs = n_pegs
         self.n_rows = rows
         self._type = _type
 
-        """ Skalowanie rozmiaru kołków na planszy w zależności od ich ilości
-            Tutaj dzieję się magia elementarnej geometrii przy ustawianiu rozmiarów, przesunięć oraz odstępów
-         """
-        self.scaling_coeff = 5 - rows / n_pegs  # im wyższy stosunek rzędów do elementów tym mniejsze są elementy
-        self.peg_offset_x = 50 + (3 - n_pegs) * 20  # przesunięcie bazowe elementów od lewej krawędzi
-        self.peg_offset_y = round(-45 + 30 * self.scaling_coeff)  # przesunięcie bazowe elementów od górnej krawędzi
-        if n_pegs >= 5 or n_pegs == 4 and rows < 12:  # dla większej ilość elementów przesunięcie bazowe...
-            self.peg_offset_y -= 50              # ...od górnej krawędzi może być większe(żeby się zmieściły wszystkie)
-        self.change_x = self.change_x_base / n_pegs  # odstępy pomiędzy elementami w rzędach
-        self.change_y = self.change_y_base / rows  # odstępy między rzędami
-        self.peg_size = round(self.scaling_coeff * self.change_x / 14)  # rozmiar elementu
-        self.font_size = 24 * int(self.scaling_coeff)  # rozmiar czcionki uzależniony od stosunku rzędów do elementów
+        """ Skalowanie rozmiaru kołków na planszy w zależności od ich ilości """
+        self.scaling_coeff = 5 - rows / n_pegs
+        self.peg_offset_x = 50 + (3 - n_pegs) * 20
+        self.peg_offset_y = round(-45 + 30 * self.scaling_coeff)
+        if n_pegs >= 5 or n_pegs == 4 and rows < 12:
+            self.peg_offset_y -= 50
+        self.change_x = self.change_x_base / n_pegs
+        self.change_y = self.change_y_base / rows
+        self.peg_size = self.scaling_coeff * self.change_x / 14
+        self.peg_size = round(self.peg_size)
 
         if self._type == "Peg":
             """ Generuje ukryty kod do zgadnięcia """
@@ -208,6 +209,7 @@ class Board(GFXEntity):
                     if j == k:
                         self.winning_pegs.append(colors[key])
                         break
+
             """ Wypełnia pola w planszy białymi kołkami. """
             self.rows_of_pegs = [[] for _ in range(rows)]
             for i, row in enumerate(self.rows_of_pegs):
@@ -260,10 +262,9 @@ class Board(GFXEntity):
                                 ),
                                 colors["white"],
                                 self._window,
-                                self.peg_size,
-                                "",
+                                (self.peg_size, self.peg_size),
+                                "_",
                                 colors["red"],
-                                self.font_size,
                             )
                         )
 
@@ -290,7 +291,7 @@ class Board(GFXEntity):
                 for peg in row:
                     peg.draw()
 
-    def change(self, mouse_cords, clicked) -> list:
+    def interact(self, mouse_cords, clicked) -> list:
         """ Metoda sprawdza po kolei kołki na planszy, czy zostały kliknięte """
         for peg in self.rows_of_pegs[self.active_row]:
             clicked = peg.change(mouse_cords, clicked)
@@ -300,14 +301,17 @@ class Board(GFXEntity):
     def message(self):
         return self._message
 
-    @message.setter
-    def message(self, text: str):
-        self._message = text
+    def change_message(self, condition: str):
+        if condition == "win":
+            self._message = "WYGRALES  !"
+        elif condition == "lose":
+            self._message = "PRZEGRALES  !"
+        else:
+            self._message = condition
 
-    @property
-    def rects(self):
+    def get_rects(self):
         """ Zwraca obiekty typu rect potrzebne to sprawdzania kolizji z myszką """
-        rects = [self.button.rect]
+        rects = [self.button.get_rect()]
         for row in self.rows_of_pegs:
             for peg in row:
                 rects.append(peg.rect.copy())
@@ -323,7 +327,7 @@ class Button(GFXEntity):
 
     clicked = False
 
-    def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size: tuple):
+    def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size):
         super().__init__(pos, color, window, size)
 
     def interact(self, mouse_cords, clicked):
@@ -340,26 +344,26 @@ class Button(GFXEntity):
 class CheckButton(Button):
     """ Przycisk używany na planszy do sprawdzenia stanu gry """
 
-    def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size: tuple):
+    def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size):
         super().__init__(pos, color, window, size)
 
     def click_button(self, board: Board, mouse_cords: tuple, clicked: tuple) -> list:
         """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu. """
-        pegs_or_letters = board.type
+        pegs_or_letters = Board.type
         active_row = board.active_row
         winning_pegs = board.winning_pegs
         rows_of_pegs = board.rows_of_pegs
         n_pegs = board.n_pegs
         board_state = [
-            item.color if pegs_or_letters == "Peg" else item.value if pegs_or_letters == "Letter"
-            else [] for item in rows_of_pegs[active_row]
+            item.color if pegs_or_letters == "Peg" else item.value for item in rows_of_pegs[active_row]
         ]
+
         x, y = mouse_cords
         lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
         if self._rect.collidepoint(x, y) and lmb and rmb:
-            if winning_pegs != [colors["white"] for _ in range(n_pegs)] != board_state != ["" for _ in range(n_pegs)]:
+            if board_state != [colors["white"] for _ in range(n_pegs)] != winning_pegs:
                 if board_state == winning_pegs:
-                    board.message = "wygrales    !!!"
+                    board.change_message("win")
                     data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
                     data.win_percentage = round(
                         (data.won_matches / data.played_matches) * 100
@@ -385,19 +389,23 @@ class CheckButton(Button):
                                 already_used_secret[i] = True
                                 already_used_user[j] = True
 
-                    board.message = f'{board.active_row+1}{" "*8}Row{" "*8}{bulls}{" "*8}bulls{" "*8}{cows}{" "*8}' \
-                                    f'  cows'
+                    board.change_message(
+                        f'{board.active_row+1}{" "*8}Row{" "*8}{bulls}{" "*8}bulls{" "*8}{cows}{" "*8}'
+                        f"cows"
+                    )
+                    SaveData.save_game( board_state, board.active_row, board.n_pegs )
                     active_row += 1
                     if active_row >= board.n_rows:
-                        board.message = "przegrales   !!!"
+                        board.change_message("lose")
                         return [False, False]
                 clicked = [False, True]
             else:
-                board.message = "Wszystkie    pola    nie    moga    byc    puste!"
+                board.change_message(
+                    "Wszystkie    pola    nie    moga    byc    puste!"
+                )
         board.active_row = active_row
         return clicked
 
-    @property
-    def rect(self):
+    def get_rect(self):
         """ Zwraca obiekt typu rect potrzebny to sprawdzania kolizji z myszką """
         return self._rect.copy()
