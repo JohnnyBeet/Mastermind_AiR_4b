@@ -96,10 +96,10 @@ def choose_game():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 if choice.normal.is_pointing(pos):
-                    main_singleplayer.gamemode = "Peg"
+                    main_singleplayer.GAME_MODE = "Peg"
                     main_singleplayer.play_game()
                 elif choice.word.is_pointing(pos):
-                    main_singleplayer.gamemode = "Letter"
+                    main_singleplayer.GAME_MODE = "Letter"
                     main_singleplayer.play_game()
                 elif choice.back.is_pointing(pos):
                     is_done = True

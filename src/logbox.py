@@ -1,6 +1,6 @@
-from src.game_classes import GFXEntity
-import pygame.freetype
 from typing import Tuple
+import pygame.freetype
+from src.game_classes import GFXEntity
 
 
 class LogBox(GFXEntity):

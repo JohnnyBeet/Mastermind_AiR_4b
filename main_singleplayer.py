@@ -1,3 +1,4 @@
+import sys
 import pygame.freetype
 from src.game_classes import Board, data
 from src.logbox import LogBox
@@ -9,9 +10,11 @@ from src.settings_loading import (
     board_configs,
     logbox_configs,
 )
-import sys
 
-gamemode = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
+""" Główny plik gry uruchamiany z menu. Obsługuje zarówno tryb klasyczny jak i słowny Mastermind """
+
+
+GAME_MODE = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
 
 
 def play_game():
@@ -66,12 +69,12 @@ def play_game():
             pygame.display.flip()
 
     # dwa ify zapisujące statystyki rozegranych meczy w obu trybach
-    if gamemode == "Letter":
+    if GAME_MODE == "Letter":
         data.played_matches += 1
         data.win_percentage = round((data.won_matches / data.played_matches) * 100)
         data.word_version += 1
         data.save_stats()
-    elif gamemode == "Peg":
+    elif GAME_MODE == "Peg":
         data.played_matches += 1
         data.win_percentage = round((data.won_matches / data.played_matches) * 100)
         data.normal_mastermind += 1
@@ -84,7 +87,7 @@ def play_game():
         screen,
         peg_num,
         row_num,
-        gamemode  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
+        GAME_MODE  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
     )
     logbox = LogBox(
         logbox_configs["pos"],
