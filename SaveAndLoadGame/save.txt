@@ -1,1 +1,1 @@
-
+{"colors": [], "active_row": 4, "n_pegs": 3, "rows": 2, "rows_of_pegs": null, "winning_code": []}

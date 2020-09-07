@@ -10,14 +10,14 @@ from src.settings_loading import (
     board_configs,
     logbox_configs,
 )
-
+from SaveAndLoadGame.save_game import *
 """ Główny plik gry uruchamiany z menu. Obsługuje zarówno tryb klasyczny jak i słowny Mastermind """
 
 
 GAME_MODE = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
 
 
-def play_game():
+def play_game(is_loaded = 0):
     """ Ta funkcja jest konieczna do odpalenia gry z poziomu menu, uzycie exec() na tym pliku
         nie dawalo oczekiwanych rezultatow. """
 
@@ -36,6 +36,8 @@ def play_game():
     menu = GameSettingMenu(
         menu_configs["pos"], colors["aqua"], screen, menu_configs["size"]
     )
+
+    # if not is_loaded:
     menu.draw()  # pygame.Rect trójkątnych przycisków pojawiają się dopiero po narysowaniu
     clickable_rects = menu.rects
     mouse_logic_list = [False, True]
@@ -89,6 +91,12 @@ def play_game():
         row_num,
         GAME_MODE  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
     )
+    # if is_loaded:
+    #     with open('src/save.txt', 'r') as file:
+    #         loaded_colors = json.load(file)
+    #     for i, row in enumerate(board.rows_of_pegs):
+    #         for j, peg in enumerate(row):
+    #             peg.color = loaded_colors[j + i * peg_num]
     logbox = LogBox(
         logbox_configs["pos"],
         logbox_configs["size"],

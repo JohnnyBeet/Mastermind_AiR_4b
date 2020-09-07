@@ -128,7 +128,8 @@ def main():
                 elif menu.info.is_pointing(pos):
                     display_instructions()
                     menu = Menu()
-
+                elif menu.load.is_pointing(pos):
+                    main_singleplayer.play_game(1)
 
 if __name__ == "__main__":
     pygame.init()

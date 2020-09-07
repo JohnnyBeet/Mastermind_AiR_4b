@@ -6,6 +6,7 @@ from abc import ABC
 from src.settings_loading import colors, checkbutton_configs, game_configs
 from string import ascii_lowercase as allowed_characters
 from keyboard_input.code_input import code_input
+import json
 
 """ data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
 data = stat.Stats()
@@ -30,7 +31,6 @@ class GFXEntity(ABC):
 
 
 class Peg(GFXEntity):
-
     _state = 0
 
     """ Klasa kołka/kamyczka (w zależności od interpretacji wizualnej) """
@@ -193,7 +193,7 @@ class Board(GFXEntity):
         self.peg_offset_x = 50 + (3 - n_pegs) * 20  # przesunięcie bazowe elementów od lewej krawędzi
         self.peg_offset_y = round(-45 + 30 * self.scaling_coeff)  # przesunięcie bazowe elementów od górnej krawędzi
         if n_pegs >= 5 or n_pegs == 4 and rows < 12:  # dla większej ilość elementów przesunięcie bazowe...
-            self.peg_offset_y -= 50              # ...od górnej krawędzi może być większe(żeby się zmieściły wszystkie)
+            self.peg_offset_y -= 50  # ...od górnej krawędzi może być większe(żeby się zmieściły wszystkie)
         self.change_x = self.change_x_base / n_pegs  # odstępy pomiędzy elementami w rzędach
         self.change_y = self.change_y_base / rows  # odstępy między rzędami
         self.peg_size = round(self.scaling_coeff * self.change_x / 14)  # rozmiar elementu
@@ -345,6 +345,7 @@ class CheckButton(Button):
 
     def click_button(self, board: Board, mouse_cords: tuple, clicked: tuple) -> list:
         """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu. """
+        saved_pegs = [[] for _ in range(board.n_rows)]
         pegs_or_letters = board.type
         active_row = board.active_row
         winning_pegs = board.winning_pegs
@@ -385,9 +386,15 @@ class CheckButton(Button):
                                 already_used_secret[i] = True
                                 already_used_user[j] = True
 
-                    board.message = f'{board.active_row+1}{" "*8}Row{" "*8}{bulls}{" "*8}bulls{" "*8}{cows}{" "*8}' \
+                    board.message = f'{board.active_row + 1}{" " * 8}Row{" " * 8}{bulls}{" " * 8}bulls{" " * 8}{cows}{" " * 8}' \
                                     f'  cows'
                     active_row += 1
+                    # if board.type == 'Peg':
+                    #     for i, row in enumerate(board.rows_of_pegs):
+                    #         for peg in row:
+                    #             saved_pegs[i].append(peg.color)
+                    #     with open('src/save.txt', 'w') as outfile:
+                    #         json.dump(saved_pegs, outfile)
                     if active_row >= board.n_rows:
                         board.message = "przegrales   !!!"
                         return [False, False]
