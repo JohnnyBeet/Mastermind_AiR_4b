@@ -47,3 +47,15 @@ class LogBox(GFXEntity):
         self.draw()
         for i, text in enumerate(self._texts):
             font.render_to(self._window, self._rects[i], text, self._text_color)
+
+    @property
+    def texts(self):
+        return self._texts
+
+    @texts.setter
+    def texts(self, loaded_texts: list):
+        """ Setter to ustawiania logów z zapisanej poprzednio gry """
+        if len(loaded_texts) == self._n_texts:
+            self._texts = loaded_texts
+        else:
+            raise AttributeError(f"Liczba wiadomości w logach jest nieodpowiednia! - powinno ich być {self._n_texts}")

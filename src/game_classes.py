@@ -1,4 +1,5 @@
 import random
+import re
 import pygame
 import pygame.freetype
 import Statistics.statistics as stat
@@ -29,15 +30,67 @@ class GFXEntity(ABC):
         """ Rysuje obiekt w wskazanym oknie """
         pygame.draw.rect(self._window, self._color, self._rect)
 
+    def to_json(self):
+        """ Tworzy dane o parametrach obiektu zdatne do zapisania w formacie JSON """
+        illegal_params = ["_window", "_rect", "_click_rect", "_letter_rect"]  # parametry które nie trzeba/można zapisać
+        json_data = self.__dict__
+        copy = json_data.copy()
+
+        type_str = str(self.__class__)
+        type_pattern = r"\b.\w+"
+        json_data["_type"] = re.findall(type_pattern, type_str)[-1][1:]  # magia regexów
+
+        for key in copy.keys():
+            if key in illegal_params:
+                del json_data[key]
+        return json_data
+
+    @staticmethod
+    def from_json(json_data, window: pygame.Surface):
+        """ Tworzy obiekt z parametrów z JSON-a. Z uwagi, że ciężko  zapisać obiekt pygame.Surface w formacie JSON
+            to należy również podać i parametr window - czyli okno w którym dany obiekt jest wyświetlany(u nas screen)
+        """
+        def create(json_data) -> GFXEntity:
+            # ładuje parametry które posiada GFXEntity
+            loaded_pos = json_data["_pos"]
+            loaded_color = json_data["_color"]
+            loaded_type = json_data["_type"]
+
+            # tutaj ładują się pozostałe parametry i tworzone są obiekty
+            if loaded_type == "Peg":
+                loaded_radius = json_data["_radius"]
+                loaded_state = json_data["_state"]
+                created_peg = Peg(loaded_pos, loaded_color, loaded_radius, window)
+                created_peg._state = loaded_state
+                return created_peg
+
+            elif loaded_type == "Letter":
+                loaded_value = json_data["_value"]
+                loaded_font_color = json_data["_font_color"]
+                loaded_font_size = json_data["_font_size"]
+                loaded_radius = json_data["_radius"]
+                return Letter(loaded_pos, loaded_color, loaded_radius, window, loaded_value, loaded_font_color,
+                              loaded_font_size)
+            else:
+                # innych obiektów nie musimy tworzyć z json-a w taki sposób
+                raise NotImplemented
+
+        if isinstance(json_data, dict):
+            return create(json_data)
+        elif isinstance(json_data, str):
+            json_data = json.loads(json_data)
+            return create(json_data)
+        else:
+            raise TypeError("Nie potrafię stworzyć obiektu z takich danych!")
+
 
 class Peg(GFXEntity):
-    _state = 0
-
     """ Klasa kołka/kamyczka (w zależności od interpretacji wizualnej) """
 
     def __init__(self, pos: tuple, color: tuple, radius: int, window: pygame.Surface):
         super().__init__(pos, color, window)
         self._radius = radius
+        self._state = 0
         self._rect = pygame.draw.circle(
             self._window, self._color, self._pos, self._radius
         )
@@ -80,8 +133,8 @@ class Letter(GFXEntity):
         self,
         pos: tuple,
         color: tuple,
-        window: pygame.Surface,
         radius: int,
+        window: pygame.Surface,
         value,
         font_color: tuple,
         font_size=24,
@@ -259,8 +312,8 @@ class Board(GFXEntity):
                                     + round(self.change_y * i),
                                 ),
                                 colors["white"],
-                                self._window,
                                 self.peg_size,
+                                self._window,
                                 "",
                                 colors["red"],
                                 self.font_size,

@@ -1,23 +1,22 @@
 import sys
 import pygame.freetype
-from src.game_classes import Board, data
-from src.logbox import LogBox
+from SaveAndLoadGame.save_game import *
 from src.game_setting import GameSettingMenu
+from src.logbox import LogBox
 from src.settings_loading import (
-    colors,
-    game_configs,
     menu_configs,
     board_configs,
     logbox_configs,
 )
-from SaveAndLoadGame.save_game import *
+
 """ Główny plik gry uruchamiany z menu. Obsługuje zarówno tryb klasyczny jak i słowny Mastermind """
 
-
+# TODO: przydałoby się również ładować i zapisywać poprzednio wybrany tryb gry (można skorzystać z json_data["_type"]
+#  w pliku save_load_test.py)
 GAME_MODE = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
 
 
-def play_game(is_loaded = 0):
+def play_game(is_loaded=0):
     """ Ta funkcja jest konieczna do odpalenia gry z poziomu menu, uzycie exec() na tym pliku
         nie dawalo oczekiwanych rezultatow. """
 
@@ -82,6 +81,11 @@ def play_game(is_loaded = 0):
         data.normal_mastermind += 1
         data.save_stats()
 
+    # TODO: board można tworzyć z zapisanych parametrów w następujący sposób:
+    # if is_loaded:
+        # peg_num = n_pegs
+        # row_num = rows
+
     board = Board(
         board_configs["pos"],
         board_configs["size"],
@@ -91,12 +95,22 @@ def play_game(is_loaded = 0):
         row_num,
         GAME_MODE  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
     )
+    # TODO: sugestia, metoda load_game zwraca również struktury loaded_rows_of_pegs, loaded_winning_pegs,
+    #  loaded_active_row, zatem wystarczy zrobić następującą podmianę aby wznowić już wcześniej zapisaną planszę board:
+    # if is_loaded:
+    #   board.rows_of_pegs = loaded_rows_of_pegs
+    #   board.winning_pegs = loaded_winning_pegs
+    #   board.active_row = loaded_active_row
+
+    # to jest twoje, ale po zrobieniu powyższej podmiany myślę że będzie to już zbędne
     # if is_loaded:
     #     with open('src/save.txt', 'r') as file:
     #         loaded_colors = json.load(file)
     #     for i, row in enumerate(board.rows_of_pegs):
     #         for j, peg in enumerate(row):
     #             peg.color = loaded_colors[j + i * peg_num]
+
+    # TODO: logi z logbox'a też powinny być zapisywane i odczytywane
     logbox = LogBox(
         logbox_configs["pos"],
         logbox_configs["size"],
@@ -105,6 +119,10 @@ def play_game(is_loaded = 0):
         screen,
         logbox_configs["number_of_messages_displayed"],
     )
+    # można je podmienić następująco:
+    # if is_loaded:
+    #   logbox.texts = loaded_texts
+
     clickable_rects = board.rects
     mouse_logic_list = [
         False,
