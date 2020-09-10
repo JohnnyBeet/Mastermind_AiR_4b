@@ -46,7 +46,7 @@ pip install -r requirements.txt
 '''
 A następnie aby już zagrać:
 '''
-python Menu/menu.py
+python menu.py
 '''
 Bądź też można skorzystać z pliku 'Zagraj.bat', który włączy grę za nas.
 
