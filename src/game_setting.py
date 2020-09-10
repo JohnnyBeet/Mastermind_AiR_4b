@@ -84,18 +84,18 @@ class Display(GFXEntity):
         self.display_size = display_size
         x, y = pos
         self.left_button = TriangularButton(
-            (x - self.button_gap, y),
-            self.button_color,
-            window,
-            self.button_side,
-            "left",
+            pos=(x - self.button_gap, y),
+            color=self.button_color,
+            window=window,
+            side=self.button_side,
+            orientation="left",
         )
         self.right_button = TriangularButton(
-            (x + self.button_gap, y),
-            self.button_color,
-            window,
-            self.button_side,
-            "right",
+            pos=(x + self.button_gap, y),
+            color=self.button_color,
+            window=window,
+            side=self.button_side,
+            orientation="right",
         )
 
     @property
@@ -156,24 +156,24 @@ class GameSettingMenu(GFXEntity):
         super().__init__(pos, color, window, size)
         x, y = pos
         self.code_lenght_display = Display(
-            (x + self.x_offset, y + self.y_offset),
-            self.display_size,
-            color,
-            window,
-            AVAILABLE_CODE_LENGHTS,
+            pos=(x + self.x_offset, y + self.y_offset),
+            size=self.display_size,
+            color=color,
+            window=window,
+            values=AVAILABLE_CODE_LENGHTS,
         )
         self.difficulty_display = Display(
-            (x + self.x_offset, y + self.y_offset + self.another_display_offset),
-            self.display_size,
-            color,
-            window,
-            AVAILABLE_DIFFICULTY_LVLS,
+            pos=(x + self.x_offset, y + self.y_offset + self.another_display_offset),
+            size=self.display_size,
+            color=color,
+            window=window,
+            values=AVAILABLE_DIFFICULTY_LVLS,
         )
         self.button = Button(
-            menu_button_configs["pos"],
-            menu_button_configs["color"],
-            self._window,
-            menu_button_configs["size"],
+            pos=menu_button_configs["pos"],
+            color=menu_button_configs["color"],
+            window=self._window,
+            size=menu_button_configs["size"],
         )
 
     def draw(self):
@@ -209,8 +209,8 @@ class GameSettingMenu(GFXEntity):
     def rects(self):
         """ Zwraca obiekty typu rect potrzebne to sprawdzania kolizji z myszką """
         rects = [
-            self.button._rect.copy(),
-            self.difficulty_display.left_button.get_rect().copy(),
+            self.button._rect,
+            self.difficulty_display.left_button.get_rect(),
             self.difficulty_display.right_button.get_rect(),
             self.code_lenght_display.left_button.get_rect(),
             self.code_lenght_display.right_button.get_rect(),

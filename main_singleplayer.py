@@ -35,7 +35,10 @@ def play_game(is_loaded=0):
     row_num = None
 
     menu = GameSettingMenu(
-        menu_configs["pos"], colors["aqua"], screen, menu_configs["size"]
+        pos=menu_configs["pos"],
+        color=colors["aqua"],
+        window=screen,
+        size=menu_configs["size"],
     )
 
     # if not is_loaded:
@@ -85,17 +88,17 @@ def play_game(is_loaded=0):
 
     # TODO: board można tworzyć z zapisanych parametrów w następujący sposób:
     # if is_loaded:
-        # peg_num = loaded.n_pegs
-        # row_num = loaded.rows
+    # peg_num = loaded.n_pegs
+    # row_num = loaded.rows
 
     board = Board(
-        board_configs["pos"],
-        board_configs["size"],
-        board_configs["color"],
-        screen,
-        peg_num,
-        row_num,
-        GAME_MODE  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
+        pos=board_configs["pos"],
+        size=board_configs["size"],
+        color=board_configs["color"],
+        window=screen,
+        n_pegs=peg_num,
+        rows=row_num,
+        _type=GAME_MODE,  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
     )
     # TODO: sugestia, metoda load_game zwraca również struktury loaded_rows_of_pegs, loaded_winning_pegs,
     #  loaded_active_row, zatem wystarczy zrobić następującą podmianę aby wznowić już wcześniej zapisaną planszę board:
@@ -106,12 +109,12 @@ def play_game(is_loaded=0):
 
     # TODO: logi z logbox'a też powinny być zapisywane i odczytywane
     logbox = LogBox(
-        logbox_configs["pos"],
-        logbox_configs["size"],
-        logbox_configs["background_color"],
-        logbox_configs["text_color"],
-        screen,
-        logbox_configs["number_of_messages_displayed"],
+        pos=logbox_configs["pos"],
+        size=logbox_configs["size"],
+        color=logbox_configs["background_color"],
+        text_color=logbox_configs["text_color"],
+        window=screen,
+        n_texts=logbox_configs["number_of_messages_displayed"],
     )
     # można je podmienić następująco:
     # if is_loaded:

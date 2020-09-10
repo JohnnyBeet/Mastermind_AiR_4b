@@ -32,12 +32,17 @@ class GFXEntity(ABC):
 
     def to_json(self):
         """ Tworzy dane o parametrach obiektu zdatne do zapisania w formacie JSON """
-        illegal_params = ["_window", "_rect", "_click_rect", "_letter_rect"]  # parametry które nie trzeba/można zapisać
+        illegal_params = [
+            "_window",  # nie sposób zapisać obiektu pygame.Surface do jsona
+            "_rect",  # pygame.Rect tworzony jest przez konstruktor
+            "_click_rect",  # pygame.Rect tworzony jest przez konstruktor
+            "_letter_rect",  # pygame.Rect tworzony jest przez konstruktor
+        ]  # parametry które nie trzeba/można zapisać
         json_data = self.__dict__
         copy = json_data.copy()
 
-        type_str = str(self.__class__)
-        type_pattern = r"\b.\w+"
+        type_str = str(self.__class__)  # zmienia opis klasy obiektu na stringa
+        type_pattern = r"\b.\w+"  # szukaj ".<wyraz>"
         json_data["_type"] = re.findall(type_pattern, type_str)[-1][1:]  # magia regexów
 
         for key in copy.keys():
@@ -50,27 +55,43 @@ class GFXEntity(ABC):
         """ Tworzy obiekt z parametrów z JSON-a. Z uwagi, że ciężko  zapisać obiekt pygame.Surface w formacie JSON
             to należy również podać i parametr window - czyli okno w którym dany obiekt jest wyświetlany(u nas screen)
         """
-        def create(json_data) -> GFXEntity:
+
+        def create(_json_data) -> GFXEntity:
             # ładuje parametry które posiada GFXEntity
-            loaded_pos = json_data["_pos"]
-            loaded_color = json_data["_color"]
-            loaded_type = json_data["_type"]
+            loaded_pos = _json_data["_pos"]
+            loaded_color = _json_data["_color"]
+            loaded_type = _json_data["_type"]
 
             # tutaj ładują się pozostałe parametry i tworzone są obiekty
             if loaded_type == "Peg":
-                loaded_radius = json_data["_radius"]
-                loaded_state = json_data["_state"]
-                created_peg = Peg(loaded_pos, loaded_color, loaded_radius, window)
+
+                loaded_radius = _json_data["_radius"]
+                loaded_state = _json_data["_state"]
+                created_peg = Peg(
+                    pos=loaded_pos,
+                    color=loaded_color,
+                    radius=loaded_radius,
+                    window=window,
+                )
                 created_peg._state = loaded_state
                 return created_peg
 
             elif loaded_type == "Letter":
-                loaded_value = json_data["_value"]
-                loaded_font_color = json_data["_font_color"]
-                loaded_font_size = json_data["_font_size"]
-                loaded_radius = json_data["_radius"]
-                return Letter(loaded_pos, loaded_color, loaded_radius, window, loaded_value, loaded_font_color,
-                              loaded_font_size)
+
+                loaded_value = _json_data["_value"]
+                loaded_font_color = _json_data["_font_color"]
+                loaded_font_size = _json_data["_font_size"]
+                loaded_radius = _json_data["_radius"]
+
+                return Letter(
+                    pos=loaded_pos,
+                    color=loaded_color,
+                    radius=loaded_radius,
+                    window=window,
+                    value=loaded_value,
+                    font_color=loaded_font_color,
+                    font_size=loaded_font_size,
+                )
             else:
                 # innych obiektów nie musimy tworzyć z json-a w taki sposób
                 raise NotImplemented
@@ -128,7 +149,6 @@ class Peg(GFXEntity):
 
 
 class Letter(GFXEntity):
-
     def __init__(
         self,
         pos: tuple,
@@ -146,10 +166,11 @@ class Letter(GFXEntity):
         self._font_size = font_size
         self._font_path = font_path
         self._radius = radius  # promień okręgu wokół literki
-        # TODO: pozycja liter również mogłaby się skalować wraz z ich rozmiarem aby nie wychodzić poza białe koło
-        self._letter_pos = self._pos[0] - round(self._radius / 2), self._pos[1] - round(self._radius / 2)
-        self._letter_rect = pygame.Rect(self._letter_pos, (self._radius, self._radius))
-        self._click_rect = pygame.draw.circle(self._window, self._color, self._pos, self._radius).union(
+        self._letter_rect = pygame.Rect(self._pos, (self._radius, self._radius))
+        self._letter_rect.center = self._rect.center
+        self._click_rect = pygame.draw.circle(
+            self._window, self._color, self._pos, self._radius
+        ).union(
             self._letter_rect.copy()  # rect obejmujący zarówno rect litery jak i białego pola
         )
 
@@ -196,7 +217,9 @@ class Letter(GFXEntity):
     def draw(self):
         """ Rysuje literkę wraz z otaczającym ją kołem """
         pygame.draw.circle(self._window, self._color, self._pos, self._radius)
-        self.font.render_to(self._window, self._letter_rect, self._value, self._font_color)
+        self.font.render_to(
+            self._window, self._letter_rect, self._value, self._font_color
+        )
 
     def change(self, mouse_cords: list, clicked: list) -> list:
         """ Metoda służy do zmieniania wartości literki.
@@ -241,16 +264,37 @@ class Board(GFXEntity):
 
         """ Skalowanie rozmiaru kołków na planszy w zależności od ich ilości
             Tutaj dzieję się magia elementarnej geometrii przy ustawianiu rozmiarów, przesunięć oraz odstępów
-         """
-        self.scaling_coeff = 5 - rows / n_pegs  # im wyższy stosunek rzędów do elementów tym mniejsze są elementy
-        self.peg_offset_x = 50 + (3 - n_pegs) * 20  # przesunięcie bazowe elementów od lewej krawędzi
-        self.peg_offset_y = round(-45 + 30 * self.scaling_coeff)  # przesunięcie bazowe elementów od górnej krawędzi
-        if n_pegs >= 5 or n_pegs == 4 and rows < 12:  # dla większej ilość elementów przesunięcie bazowe...
+        """
+        self.scaling_coeff = (
+            5 - rows / n_pegs
+        )  # im wyższy stosunek rzędów do elementów tym mniejsze są elementy
+        self.peg_offset_x = (
+            50 + (3 - n_pegs) * 20
+        )  # przesunięcie bazowe elementów od lewej krawędzi
+        self.peg_offset_y = round(
+            -45 + 30 * self.scaling_coeff
+        )  # przesunięcie bazowe elementów od górnej krawędzi
+        if (
+            n_pegs >= 5 or n_pegs == 4 and rows < 12
+        ):  # dla większej ilość elementów przesunięcie bazowe...
             self.peg_offset_y -= 50  # ...od górnej krawędzi może być większe(żeby się zmieściły wszystkie)
-        self.change_x = self.change_x_base / n_pegs  # odstępy pomiędzy elementami w rzędach
+        self.change_x = (
+            self.change_x_base / n_pegs
+        )  # odstępy pomiędzy elementami w rzędach
         self.change_y = self.change_y_base / rows  # odstępy między rzędami
-        self.peg_size = round(self.scaling_coeff * self.change_x / 14)  # rozmiar elementu
-        self.font_size = 24 * int(self.scaling_coeff)  # rozmiar czcionki uzależniony od stosunku rzędów do elementów
+        self.peg_size = round(
+            self.scaling_coeff * self.change_x / 14
+        )  # rozmiar elementu
+        self.font_size = 24 * int(
+            self.scaling_coeff
+        )  # rozmiar czcionki uzależniony od stosunku rzędów do elementów
+
+        # już się poddałem z wymyślaniem jakiegoś rozszerzalnego i łatwego w utrzymaniu systemu skalowania, więc
+        # wrzucam te dwa ify i jakoś to działa
+        if self.n_pegs == 5:
+            self.font_size *= 0.9
+        elif self.n_pegs == 6:
+            self.font_size *= 0.7
 
         if self._type == "Peg":
             """ Generuje ukryty kod do zgadnięcia """
@@ -268,7 +312,7 @@ class Board(GFXEntity):
                     for j in range(self._n_pegs):
                         self.rows_of_pegs[i].append(
                             Peg(
-                                (
+                                pos=(
                                     self.base_peg_x
                                     + self.peg_offset_x
                                     + round(self.change_x * j),
@@ -276,9 +320,9 @@ class Board(GFXEntity):
                                     + self.peg_offset_y
                                     + round(self.change_y * i),
                                 ),
-                                colors["white"],
-                                self.peg_size,
-                                self._window,
+                                color=colors["white"],
+                                radius=self.peg_size,
+                                window=self._window,
                             )
                         )
         elif self._type == "Letter":
@@ -303,7 +347,7 @@ class Board(GFXEntity):
                     for j in range(self._n_pegs):
                         self.rows_of_pegs[i].append(
                             Letter(
-                                (
+                                pos=(
                                     self.base_peg_x
                                     + self.peg_offset_x
                                     + round(self.change_x * j),
@@ -311,12 +355,12 @@ class Board(GFXEntity):
                                     + self.peg_offset_y
                                     + round(self.change_y * i),
                                 ),
-                                colors["white"],
-                                self.peg_size,
-                                self._window,
-                                "",
-                                colors["red"],
-                                self.font_size,
+                                color=colors["white"],
+                                radius=self.peg_size,
+                                window=self._window,
+                                value="",
+                                font_color=colors["red"],
+                                font_size=self.font_size,
                             )
                         )
 
@@ -404,13 +448,22 @@ class CheckButton(Button):
         rows_of_pegs = board.rows_of_pegs
         n_pegs = board.n_pegs
         board_state = [
-            item.color if pegs_or_letters == "Peg" else item.value if pegs_or_letters == "Letter"
-            else [] for item in rows_of_pegs[active_row]
+            item.color
+            if pegs_or_letters == "Peg"
+            else item.value
+            if pegs_or_letters == "Letter"
+            else []
+            for item in rows_of_pegs[active_row]
         ]
         x, y = mouse_cords
         lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
         if self._rect.collidepoint(x, y) and lmb and rmb:
-            if winning_pegs != [colors["white"] for _ in range(n_pegs)] != board_state != ["" for _ in range(n_pegs)]:
+            if (
+                winning_pegs
+                != [colors["white"] for _ in range(n_pegs)]
+                != board_state
+                != ["" for _ in range(n_pegs)]
+            ):
                 if board_state == winning_pegs:
                     board.message = "wygrales    !!!"
                     data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
@@ -438,8 +491,10 @@ class CheckButton(Button):
                                 already_used_secret[i] = True
                                 already_used_user[j] = True
 
-                    board.message = f'{board.active_row + 1}{" " * 8}Row{" " * 8}{bulls}{" " * 8}bulls{" " * 8}{cows}{" " * 8}' \
-                                    f'  cows'
+                    board.message = (
+                        f'{board.active_row + 1}{" " * 8}Row{" " * 8}{bulls}{" " * 8}bulls{" " * 8}{cows}'
+                        f'{" " * 8}   cows'
+                    )
                     active_row += 1
                     if active_row >= board.n_rows:
                         board.message = "przegrales   !!!"
