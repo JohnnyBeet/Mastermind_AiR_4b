@@ -5,7 +5,7 @@ from src.game_classes import *
 screen = pygame.display.set_mode((400, 400))
 
 
-nalezy utworzyc slownik my_dict, w ktorym beda znajdowaly sie informacje o kolorach kazdego z przyciskow na planszy
+# nalezy utworzyc slownik my_dict, w ktorym beda znajdowaly sie informacje o kolorach kazdego z przyciskow na planszy
 class SaveData:
     def __init__(self):
         self.active_row = 0
