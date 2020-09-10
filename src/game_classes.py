@@ -398,7 +398,6 @@ class CheckButton(Button):
 
     def click_button(self, board: Board, mouse_cords: tuple, clicked: tuple) -> list:
         """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu. """
-        saved_pegs = [[] for _ in range(board.n_rows)]
         pegs_or_letters = board.type
         active_row = board.active_row
         winning_pegs = board.winning_pegs
@@ -442,12 +441,6 @@ class CheckButton(Button):
                     board.message = f'{board.active_row + 1}{" " * 8}Row{" " * 8}{bulls}{" " * 8}bulls{" " * 8}{cows}{" " * 8}' \
                                     f'  cows'
                     active_row += 1
-                    # if board.type == 'Peg':
-                    #     for i, row in enumerate(board.rows_of_pegs):
-                    #         for peg in row:
-                    #             saved_pegs[i].append(peg.color)
-                    #     with open('src/save.txt', 'w') as outfile:
-                    #         json.dump(saved_pegs, outfile)
                     if active_row >= board.n_rows:
                         board.message = "przegrales   !!!"
                         return [False, False]

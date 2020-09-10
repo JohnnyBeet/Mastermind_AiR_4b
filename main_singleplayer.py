@@ -13,6 +13,8 @@ from src.settings_loading import (
 
 # TODO: przydałoby się również ładować i zapisywać poprzednio wybrany tryb gry (można skorzystać z json_data["_type"]
 #  w pliku save_load_test.py)
+# if loaded: #loaded bedzie klasa utworzona przy wczytywaniu gry
+#     GAME_MODE = loaded.game_type
 GAME_MODE = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
 
 
@@ -83,8 +85,8 @@ def play_game(is_loaded=0):
 
     # TODO: board można tworzyć z zapisanych parametrów w następujący sposób:
     # if is_loaded:
-        # peg_num = n_pegs
-        # row_num = rows
+        # peg_num = loaded.n_pegs
+        # row_num = loaded.rows
 
     board = Board(
         board_configs["pos"],
@@ -98,17 +100,9 @@ def play_game(is_loaded=0):
     # TODO: sugestia, metoda load_game zwraca również struktury loaded_rows_of_pegs, loaded_winning_pegs,
     #  loaded_active_row, zatem wystarczy zrobić następującą podmianę aby wznowić już wcześniej zapisaną planszę board:
     # if is_loaded:
-    #   board.rows_of_pegs = loaded_rows_of_pegs
-    #   board.winning_pegs = loaded_winning_pegs
-    #   board.active_row = loaded_active_row
-
-    # to jest twoje, ale po zrobieniu powyższej podmiany myślę że będzie to już zbędne
-    # if is_loaded:
-    #     with open('src/save.txt', 'r') as file:
-    #         loaded_colors = json.load(file)
-    #     for i, row in enumerate(board.rows_of_pegs):
-    #         for j, peg in enumerate(row):
-    #             peg.color = loaded_colors[j + i * peg_num]
+    #   board.rows_of_pegs = loaded.rows_of_pegs
+    #   board.winning_pegs = loaded.winning_code
+    #   board.active_row = loaded.active_row
 
     # TODO: logi z logbox'a też powinny być zapisywane i odczytywane
     logbox = LogBox(
