@@ -5,7 +5,7 @@ from src.game_classes import *
 screen = pygame.display.set_mode((400, 400))
 
 
-# nalezy utworzyc slownik my_dict, w ktorym beda znajdowaly sie informacje o kolorach kazdego z przyciskow na planszy
+nalezy utworzyc slownik my_dict, w ktorym beda znajdowaly sie informacje o kolorach kazdego z przyciskow na planszy
 class SaveData:
     def __init__(self):
         self.active_row = 0
@@ -16,18 +16,19 @@ class SaveData:
         self.winning_code = []
 
     def save_game(self, a_row, n_pegs_, rows, game_type, _rows_of_pegs, _winning_code):
+        json_data = []
         if game_type == 'Peg':
             for i, row in enumerate(_rows_of_pegs):
                 for peg in row:
-                    json_data = peg.to_json()
-                    with open('SavedAndLoad/json_data', 'w') as f:
-                        json.dump(json_data, f)
+                    json_data.append(peg.to_json())
+            with open('SavedAndLoad/json_data', 'w') as f:
+                json.dump(json_data, f)
         elif game_type == 'Letter':
             for i, row in enumerate(_rows_of_pegs):
                 for letter in row:
-                    json_data = letter.to_json()
-                    with open('SavedAndLoad/json_data', 'w') as f:
-                        json.dump(json_data, f)
+                    json_data.append(letter.to_json())
+            with open('SavedAndLoad/json_data', 'w') as f:
+                json.dump(json_data, f)
         self.active_row = a_row
         self.n_pegs = n_pegs_
         self.rows = rows
@@ -36,32 +37,36 @@ class SaveData:
         self.winning_code = _winning_code
         with open('SaveAndLoadGame/save.txt', 'w') as outfile:
             json.dump(self.__dict__, outfile)
-       
+
     # def delete_savedgame(self):
     #     with open('SaveAndLoadGame/save.txt', 'r') as file:
     #         b = json.load(file)
     #     del b
-          
+
     def load_game(self):
         with open('SaveAndLoadGame/save.txt', 'r') as file:
             self.__dict__ = json.load(file)
 
-        with open('SaveAndLoad/json_data','r') as n:
+        with open('SaveAndLoad/json_data', 'r') as n:
             json_data = json.load(n)
 
         if self.game_type == 'Peg':
             saved_pegs = []
             for i, row in enumerate(self.rows_of_pegs):
+                check = 0
                 for peg in row:
-                    saved_pegs.append(peg.from_json(json_data, screen))
+                    saved_pegs.append(peg.from_json(json_data[check + i * self.n_pegs], screen))
+                    check += 1
             for i in range(self.rows):
                 for j in range(self.n_pegs):
                     self.rows_of_pegs = saved_pegs[i + j * self.rows]
         elif self.game_type == 'Letter':
             saved_letters = []
             for i, row in enumerate(self.rows_of_pegs):
+                check = 0
                 for letter in row:
-                    saved_letters.append(letter.from_json(json_data, screen))
+                    saved_letters.append(letter.from_json(json_data[check + i * self.n_pegs], screen))
+                    check += 1
             for i in range(self.rows):
                 for j in range(self.n_pegs):
                     self.rows_of_pegs = saved_letters[i + j * self.rows]
