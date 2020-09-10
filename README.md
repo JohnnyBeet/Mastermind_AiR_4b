@@ -41,13 +41,13 @@ Przy tworzeniu projektu korzystano z następujących narzędzi:
 ## Uruchamianie
 Aby uruchomić grę należy najpierw upewnić się, czy posiada się wszystkie wymagane pakiety.
 W tym celu będąc w katalogu głównym gry wpisujemy w cmd:
-'''
-pip install -r requirements.txt
-'''
+
+    pip install -r requirements.txt
+
 A następnie aby już zagrać:
-'''
-python menu.py
-'''
+
+    python menu.py
+    
 Bądź też można skorzystać z pliku 'Zagraj.bat', który włączy grę za nas.
 
 ## Autorzy
