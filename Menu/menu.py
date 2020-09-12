@@ -5,7 +5,6 @@
 from Statistics.statistics import *
 import os
 from Instructions.instructions import *
-
 # zmiana katalogu roboczego na "Mastermind_AiR_4b"
 path_parent = os.path.dirname(os.getcwd())
 os.chdir(path_parent)

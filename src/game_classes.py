@@ -53,7 +53,7 @@ class SaveData:
         with open('SaveAndLoadGame/logbox_texts.txt', 'r') as texts_file:
             self.texts = json.load(texts_file)
 
-        with open('SaveAndLoadGame/json_data', 'r') as n:
+        with open('SaveAndLoadGame/json_data.txt', 'r') as n:
             json_data = json.load(n)
 
             if self.game_type == 'Peg':
@@ -62,9 +62,16 @@ class SaveData:
                 for i, row in enumerate(self.rows_of_pegs):
                     for j in range(self.n_pegs):
                         n_peg = Peg.from_json(json_data[m], screen)
-                        self.rows_of_pegs[i][j] = n_peg
+                        self.rows_of_pegs[i].append(n_peg)
                         m += 1
-
+            elif self.game_type == 'Letter':
+                self.rows_of_pegs = [[] for _ in range(self.rows)]
+                m = 0
+                for i, row in enumerate(self.rows_of_pegs):
+                    for j in range(self.n_pegs):
+                        n_letter = Letter.from_json(json_data[m], screen)
+                        self.rows_of_pegs[i][j] = n_letter
+                        m += 1
             # saved_pegs = []
             # for i, row in enumerate(self.rows_of_pegs):
             #     check = 0
@@ -89,7 +96,8 @@ class SaveData:
         with open('SaveAndLoadGame/logbox_texts.txt', 'w+') as saved_text_file:
             json.dump(texts, saved_text_file)
 
-new_class = SaveData()
+
+save_class = SaveData()
 
 
 class GFXEntity(ABC):
@@ -579,8 +587,8 @@ class CheckButton(Button):
                     if active_row >= board.n_rows:
                         board.message = "przegrales   !!!"
                         return [False, False]
-                    new_class.save_game(active_row, n_pegs, n_rows, pegs_or_letters, rows_of_pegs.copy(),
-                                        winning_pegs.copy())
+                    save_class.save_game(active_row, n_pegs, n_rows, pegs_or_letters, rows_of_pegs.copy(),
+                                         winning_pegs.copy())
                 clicked = [False, True]
             else:
                 board.message = "Wszystkie    pola    nie    moga    byc    puste!"

@@ -2,7 +2,7 @@ import sys
 import pygame.freetype
 from src.game_setting import GameSettingMenu
 from src.logbox import LogBox
-from src.game_classes import Board, data
+from src.game_classes import Board, data, save_class
 from src.settings_loading import (
     menu_configs,
     board_configs,
@@ -23,7 +23,7 @@ GAME_MODE = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' t
 def play_game(is_loaded=0):
     """ Ta funkcja jest konieczna do odpalenia gry z poziomu menu, uzycie exec() na tym pliku
         nie dawalo oczekiwanych rezultatow. """
-
+    global GAME_MODE
     pygame.init()
     screen_size = game_configs["screen_size"]
     background = colors["black"]
@@ -34,8 +34,9 @@ def play_game(is_loaded=0):
     screen = pygame.display.set_mode(screen_size)
     peg_num = None
     row_num = None
-
-    if not is_loaded:
+    if is_loaded:
+        save_class.load_game(screen)
+    elif not is_loaded:
 
         menu = GameSettingMenu(
             menu_configs["pos"], colors["aqua"], screen, menu_configs["size"]
@@ -86,10 +87,10 @@ def play_game(is_loaded=0):
         data.save_stats()
 
     # TODO: board można tworzyć z zapisanych parametrów w następujący sposób:
-    # if is_loaded:
-        # peg_num = loaded.n_pegs
-        # row_num = loaded.rows
-
+    if is_loaded:
+        peg_num = save_class.n_pegs
+        row_num = save_class.rows
+        GAME_MODE = save_class.game_type
     board = Board(
         board_configs["pos"],
         board_configs["size"],
@@ -101,10 +102,10 @@ def play_game(is_loaded=0):
     )
     # TODO: sugestia, metoda load_game zwraca również struktury loaded_rows_of_pegs, loaded_winning_pegs,
     #  loaded_active_row, zatem wystarczy zrobić następującą podmianę aby wznowić już wcześniej zapisaną planszę board:
-    # if is_loaded:
-    #   board.rows_of_pegs = loaded.rows_of_pegs
-    #   board.winning_pegs = loaded.winning_code
-    #   board.active_row = loaded.active_row
+    if is_loaded:
+        board.rows_of_pegs = save_class.rows_of_pegs
+        board.winning_pegs = save_class.winning_code
+        board.active_row = save_class.active_row
 
     # TODO: logi z logbox'a też powinny być zapisywane i odczytywane
     logbox = LogBox(
@@ -116,8 +117,8 @@ def play_game(is_loaded=0):
         logbox_configs["number_of_messages_displayed"],
     )
     # można je podmienić następująco:
-    # if is_loaded:
-    #   logbox.texts = loaded_texts
+    if is_loaded:
+        logbox.texts = save_class.texts
 
     clickable_rects = board.rects
     mouse_logic_list = [
