@@ -14,6 +14,7 @@ class SaveData:
         self.game_type = None
         # self.rows_of_pegs = None
         self.winning_code = []
+        self.texts = []
 
     def save_game(self, a_row, n_pegs_, rows, game_type, _rows_of_pegs, _winning_code):
         json_data = []
@@ -38,14 +39,13 @@ class SaveData:
         with open('SaveAndLoadGame/save.txt', 'w') as outfile:
             json.dump(self.__dict__, outfile)
 
-    # def delete_savedgame(self):
-    #     with open('SaveAndLoadGame/save.txt', 'r') as file:
-    #         b = json.load(file)
-    #     del b
 
     def load_game(self):
         with open('SaveAndLoadGame/save.txt', 'r') as file:
             self.__dict__ = json.load(file)
+            
+        with open('SaveAndLoadGame/logbox_texts.txt', 'r') as texts_file:
+            self.texts = json.load(texts_file)
 
         with open('SaveAndLoadGame/json_data', 'r') as n:
             json_data = json.load(n)
@@ -70,3 +70,7 @@ class SaveData:
             for i in range(self.rows):
                 for j in range(self.n_pegs):
                     self.rows_of_pegs = saved_letters[i + j * self.rows]
+                    
+    def save_logbox(self, texts: list):
+        with open('SaveAndLoadGame/logbox_texts.txt', 'w') as saved_text_file:
+            json.dump(texts, saved_text_file) 
