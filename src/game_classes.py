@@ -8,10 +8,12 @@ from src.settings_loading import colors, checkbutton_configs, game_configs
 from string import ascii_lowercase as allowed_characters
 from keyboard_input.code_input import code_input
 import json
+from SaveAndLoadGame.save_game import *
 
 """ data jest tymczasowym obiektem, który zbiera info z danej rozgrywki """
 data = stat.Stats()
 data.load_stats()  # wczytuje poprzednie statystyki, zeby ich nie utracic
+new_class = SaveData()
 
 
 class GFXEntity(ABC):
@@ -444,6 +446,8 @@ class CheckButton(Button):
                     if active_row >= board.n_rows:
                         board.message = "przegrales   !!!"
                         return [False, False]
+                    new_class.save_game(active_row, board.n_pegs, board.n_rows, board.type, board.rows_of_pegs,
+                                        board.winning_pegs)
                 clicked = [False, True]
             else:
                 board.message = "Wszystkie    pola    nie    moga    byc    puste!"

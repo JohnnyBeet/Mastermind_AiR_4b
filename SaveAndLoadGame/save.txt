@@ -1,1 +1,1 @@
-{"colors": [], "active_row": 4, "n_pegs": 3, "rows": 2, "rows_of_pegs": null, "winning_code": []}
+{"active_row": 1, "n_pegs": 3, "rows": 12, "game_type": "Peg", "winning_code": [[255, 0, 0], [200, 0, 255], [255, 255, 0]]}

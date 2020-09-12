@@ -3,6 +3,7 @@ import pygame.freetype
 from SaveAndLoadGame.save_game import *
 from src.game_setting import GameSettingMenu
 from src.logbox import LogBox
+from src.game_classes import *
 from src.settings_loading import (
     menu_configs,
     board_configs,

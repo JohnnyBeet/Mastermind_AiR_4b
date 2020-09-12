@@ -104,6 +104,7 @@ def choose_game():
                 elif choice.back.is_pointing(pos):
                     is_done = True
 
+
 def main():
     menu = Menu()
     settings = None
