@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*- 
 import json
 import pygame
-screen = pygame.display.set_mode((400, 400))
-
+from src.settings_loading import game_configs
+screen_size = game_configs["screen_size"]
+screen = pygame.display.set_mode(screen_size)
 
 #nalezy utworzyc slownik my_dict, w ktorym beda znajdowaly sie informacje o kolorach kazdego z przyciskow na planszy
+
+
 class SaveData:
     def __init__(self):
         self.active_row = 0
@@ -39,7 +42,6 @@ class SaveData:
         with open('SaveAndLoadGame/save.txt', 'w') as outfile:
             json.dump(self.__dict__, outfile)
 
-
     def load_game(self):
         with open('SaveAndLoadGame/save.txt', 'r') as file:
             self.__dict__ = json.load(file)
@@ -72,5 +74,5 @@ class SaveData:
                     self.rows_of_pegs = saved_letters[i + j * self.rows]
                     
     def save_logbox(self, texts: list):
-        with open('SaveAndLoadGame/logbox_texts.txt', 'w') as saved_text_file:
+        with open('SaveAndLoadGame/logbox_texts.txt', 'w+') as saved_text_file:
             json.dump(texts, saved_text_file) 

@@ -1,13 +1,14 @@
 import sys
 import pygame.freetype
-from SaveAndLoadGame.save_game import *
 from src.game_setting import GameSettingMenu
 from src.logbox import LogBox
-from src.game_classes import *
+from src.game_classes import Board, data
 from src.settings_loading import (
     menu_configs,
     board_configs,
     logbox_configs,
+    game_configs,
+    colors
 )
 
 """ Główny plik gry uruchamiany z menu. Obsługuje zarówno tryb klasyczny jak i słowny Mastermind """
@@ -31,46 +32,46 @@ def play_game(is_loaded=0):
         game_configs["font_path"], game_configs["font_size"]
     )
     screen = pygame.display.set_mode(screen_size)
-
     peg_num = None
     row_num = None
 
-    menu = GameSettingMenu(
-        menu_configs["pos"], colors["aqua"], screen, menu_configs["size"]
-    )
+    if not is_loaded:
 
-    # if not is_loaded:
-    menu.draw()  # pygame.Rect trójkątnych przycisków pojawiają się dopiero po narysowaniu
-    clickable_rects = menu.rects
-    mouse_logic_list = [False, True]
-    while not (peg_num and row_num):
-        """ Pętla menu wyboru parametrów gry """
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if pygame.mouse.get_pressed()[0]:
-                    mouse_logic_list = [True, False]
-            if event.type == pygame.MOUSEBUTTONUP:
-                first_check = False
-                second_check = False
-                if not pygame.mouse.get_pressed()[0] and mouse_logic_list[0]:
-                    first_check = True
-                for rect in clickable_rects:
-                    x, y = pygame.mouse.get_pos()
-                    if rect.collidepoint(x, y):
-                        second_check = True
-                        break
-                if first_check and second_check:
-                    mouse_logic_list = [True, True]
-                else:
-                    mouse_logic_list = [False, True]
+        menu = GameSettingMenu(
+            menu_configs["pos"], colors["aqua"], screen, menu_configs["size"]
+        )
 
-            screen.fill(background)
-            menu.draw()
-            mouse_logic_list = menu.check(pygame.mouse.get_pos(), mouse_logic_list)
-            peg_num, row_num = menu.return_game_settings()
-            pygame.display.flip()
+        menu.draw()  # pygame.Rect trójkątnych przycisków pojawiają się dopiero po narysowaniu
+        clickable_rects = menu.rects
+        mouse_logic_list = [False, True]
+        while not (peg_num and row_num):
+            """ Pętla menu wyboru parametrów gry """
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if pygame.mouse.get_pressed()[0]:
+                        mouse_logic_list = [True, False]
+                if event.type == pygame.MOUSEBUTTONUP:
+                    first_check = False
+                    second_check = False
+                    if not pygame.mouse.get_pressed()[0] and mouse_logic_list[0]:
+                        first_check = True
+                    for rect in clickable_rects:
+                        x, y = pygame.mouse.get_pos()
+                        if rect.collidepoint(x, y):
+                            second_check = True
+                            break
+                    if first_check and second_check:
+                        mouse_logic_list = [True, True]
+                    else:
+                        mouse_logic_list = [False, True]
+
+                screen.fill(background)
+                menu.draw()
+                mouse_logic_list = menu.check(pygame.mouse.get_pos(), mouse_logic_list)
+                peg_num, row_num = menu.return_game_settings()
+                pygame.display.flip()
 
     # dwa ify zapisujące statystyki rozegranych meczy w obu trybach
     if GAME_MODE == "Letter":
