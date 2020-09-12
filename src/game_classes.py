@@ -70,7 +70,7 @@ class SaveData:
                 for i, row in enumerate(self.rows_of_pegs):
                     for j in range(self.n_pegs):
                         n_letter = Letter.from_json(json_data[m], screen)
-                        self.rows_of_pegs[i][j] = n_letter
+                        self.rows_of_pegs[i].append(n_letter)
                         m += 1
             # saved_pegs = []
             # for i, row in enumerate(self.rows_of_pegs):
