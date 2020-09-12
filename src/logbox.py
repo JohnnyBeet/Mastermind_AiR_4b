@@ -1,9 +1,10 @@
 from typing import Tuple
 import pygame.freetype
-from SaveAndLoadGame.save_game import SaveData
+from  src.game_classes import SaveData
 from src.game_classes import GFXEntity
 
 save_class = SaveData()
+
 
 class LogBox(GFXEntity):
     """ Klasa okna dialogowego z logami na temat stanu gry """

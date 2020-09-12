@@ -1,1 +1,1 @@
-{"active_row": 1, "n_pegs": 3, "rows": 12, "game_type": "Letter", "rows_of_pegs": null, "winning_code": ["t", "e", "n"], "texts": []}
+{"active_row": 1, "n_pegs": 3, "rows": 12, "game_type": "Peg", "rows_of_pegs": null, "winning_code": [[200, 0, 255], [255, 0, 0], [200, 0, 255]], "texts": []}
