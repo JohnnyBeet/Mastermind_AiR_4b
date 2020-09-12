@@ -3,6 +3,7 @@
 import json
 import pygame
 from src.settings_loading import game_configs
+# from src.game_classes import Peg
 screen_size = game_configs["screen_size"]
 screen = pygame.display.set_mode(screen_size)
 
@@ -15,7 +16,7 @@ class SaveData:
         self.n_pegs = 0
         self.rows = 0
         self.game_type = None
-        # self.rows_of_pegs = None
+        self.rows_of_pegs = None
         self.winning_code = []
         self.texts = []
 
@@ -37,7 +38,6 @@ class SaveData:
         self.n_pegs = n_pegs_
         self.rows = rows
         self.game_type = game_type
-        # self.rows_of_pegs = _rows_of_pegs
         self.winning_code = _winning_code
         with open('SaveAndLoadGame/save.txt', 'w') as outfile:
             json.dump(self.__dict__, outfile)
@@ -52,16 +52,23 @@ class SaveData:
         with open('SaveAndLoadGame/json_data', 'r') as n:
             json_data = json.load(n)
 
-        if self.game_type == 'Peg':
-            saved_pegs = []
-            for i, row in enumerate(self.rows_of_pegs):
-                check = 0
-                for peg in row:
-                    saved_pegs.append(peg.from_json(json_data[check + i * self.n_pegs], screen))
-                    check += 1
-            for i in range(self.rows):
-                for j in range(self.n_pegs):
-                    self.rows_of_pegs = saved_pegs[i + j * self.rows]
+            if self.game_type == 'Peg':
+                self.rows_of_pegs = [[] for _ in range(self.rows)]
+                for i, row in enumerate(self.rows_of_pegs):
+                    for j in range(self.n_pegs):
+                        n_peg = Peg(json_data[j + i * self.n_pegs][0], json_data[j + i * self.n_pegs][1],
+                                    json_data[j + i * self.n_pegs][3], screen)
+                        self.rows_of_pegs[i].append(n_peg)
+
+            # saved_pegs = []
+            # for i, row in enumerate(self.rows_of_pegs):
+            #     check = 0
+            #     for peg in row:
+            #         saved_pegs.append(peg.from_json(json_data[check + i * self.n_pegs], screen))
+            #         check += 1
+            # for i in range(self.rows):
+            #     for j in range(self.n_pegs):
+            #         self.rows_of_pegs = saved_pegs[i + j * self.rows]
         elif self.game_type == 'Letter':
             saved_letters = []
             for i, row in enumerate(self.rows_of_pegs):
@@ -72,7 +79,7 @@ class SaveData:
             for i in range(self.rows):
                 for j in range(self.n_pegs):
                     self.rows_of_pegs = saved_letters[i + j * self.rows]
-                    
+
     def save_logbox(self, texts: list):
         with open('SaveAndLoadGame/logbox_texts.txt', 'w+') as saved_text_file:
             json.dump(texts, saved_text_file) 
