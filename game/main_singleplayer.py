@@ -32,10 +32,6 @@ def play_game(save, load, check_b, is_loaded=0):
     row_num = None
     if is_loaded:
         save_class.load_game(screen)
-        # background1 = pygame.display.set_mode(screen_size, pygame.HWSURFACE | pygame.DOUBLEBUF)
-        # background1.fill((255, 192, 203))
-        # back.draw(screen)
-        # pygame.display.update()
     elif not is_loaded:
 
         menu = GameSettingMenu(
@@ -134,7 +130,7 @@ def play_game(save, load, check_b, is_loaded=0):
                 if save.is_pointing(pos):
                     save_class.save_game(board.active_row, board.n_pegs, board.n_rows, GAME_MODE, board.rows_of_pegs, board.winning_pegs)
                 elif load.is_pointing(pos):
-                    play_game(save, load, 1)
+                    play_game(save, load, check_b, 1)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
                     mouse_logic_list = [True, False]
