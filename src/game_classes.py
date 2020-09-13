@@ -27,15 +27,19 @@ class SaveData:
     def save_game(self, a_row, n_pegs_, rows, game_type, _rows_of_pegs, _winning_code):
         json_data = []
         if game_type == 'Peg':
+            # tworzenie listy najwazniejszych parametrow kazdego z pegow
             for i, row in enumerate(_rows_of_pegs):
                 for peg in row:
                     json_data.append(peg.to_json())
+            # zapisywanie listy w pliku txt
             with open('SaveAndLoadGame/json_data.txt', 'w+') as f:
                 json.dump(json_data, f)
         elif game_type == 'Letter':
+            # tworzenie listy najwazniejszych parametrow kazdego z letter'ow
             for i, row in enumerate(_rows_of_pegs):
                 for letter in row:
                     json_data.append(letter.to_json())
+            # zapisywanie listy w pliku txt
             with open('SaveAndLoadGame/json_data.txt', 'w+') as f:
                 json.dump(json_data, f)
         self.active_row = a_row
@@ -44,11 +48,13 @@ class SaveData:
         self.game_type = game_type
         self.winning_code = _winning_code
         self.rows_of_pegs = None
+        # zapisywanie wszystkich pol klasy w pliku txt
         with open('SaveAndLoadGame/save.txt', 'w') as outfile:
             json.dump(self.__dict__, outfile)
 
     def load_game(self, screen):
         with open('SaveAndLoadGame/save.txt', 'r') as file:
+            # nadawanie polom klasy odpowiednich, wczytanych wartosci
             self.__dict__ = json.load(file)
 
         with open('SaveAndLoadGame/logbox_texts.txt', 'r') as texts_file:
@@ -63,6 +69,7 @@ class SaveData:
                 for i, row in enumerate(self.rows_of_pegs):
                     for j in range(self.n_pegs):
                         n_peg = Peg.from_json(json_data[m], screen)
+                        # w polu self.rows_of_pegs przechowujemy informacje o kazdym z pegow(kolor, pozycja ...)
                         self.rows_of_pegs[i].append(n_peg)
                         m += 1
             elif self.game_type == 'Letter':
@@ -71,27 +78,9 @@ class SaveData:
                 for i, row in enumerate(self.rows_of_pegs):
                     for j in range(self.n_pegs):
                         n_letter = Letter.from_json(json_data[m], screen)
+                        # w polu self.rows_of_pegs przechowujemy informacje o kazdym z letter'ow(value, pozycja ...)
                         self.rows_of_pegs[i].append(n_letter)
                         m += 1
-            # saved_pegs = []
-            # for i, row in enumerate(self.rows_of_pegs):
-            #     check = 0
-            #     for peg in row:
-            #         saved_pegs.append(peg.from_json(json_data[check + i * self.n_pegs], screen))
-            #         check += 1
-            # for i in range(self.rows):
-            #     for j in range(self.n_pegs):
-            #         self.rows_of_pegs = saved_pegs[i + j * self.rows]
-        # elif self.game_type == 'Letter':
-        #     saved_letters = []
-        #     for i, row in enumerate(self.rows_of_pegs):
-        #         check = 0
-        #         for letter in row:
-        #             saved_letters.append(letter.from_json(json_data[check + i * self.n_pegs], screen))
-        #             check += 1
-        #     for i in range(self.rows):
-        #         for j in range(self.n_pegs):
-        #             self.rows_of_pegs = saved_letters[i + j * self.rows]
 
     @staticmethod
     def save_logbox(texts: list):
