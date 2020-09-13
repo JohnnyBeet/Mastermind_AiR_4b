@@ -578,8 +578,6 @@ class CheckButton(Button):
                     if active_row >= board.n_rows:
                         board.message = "przegrales   !!!"
                         return [False, False]
-                    save_class.save_game(active_row, n_pegs, n_rows, pegs_or_letters, rows_of_pegs.copy(),
-                                         winning_pegs.copy())
                 clicked = [False, True]
             else:
                 board.message = "Wszystkie    pola    nie    moga    byc    puste!"

@@ -81,7 +81,7 @@ class ChooseGame:
         pygame.display.update()
 
 
-def choose_game():
+def choose_game(save, load, check_b):
     pygame.init()
     is_done = False
     choice = ChooseGame()
@@ -91,10 +91,10 @@ def choose_game():
                 pos = pygame.mouse.get_pos()
                 if choice.normal.is_pointing(pos):
                     main_singleplayer.GAME_MODE = "Peg"
-                    main_singleplayer.play_game()
+                    main_singleplayer.play_game(save, load, check_b, 0)
                 elif choice.word.is_pointing(pos):
                     main_singleplayer.GAME_MODE = "Letter"
-                    main_singleplayer.play_game()
+                    main_singleplayer.play_game(save, load, check_b, 0)
                 elif choice.back.is_pointing(pos):
                     is_done = True
 
@@ -117,14 +117,20 @@ def main():
                     display_stats()
                     menu = Menu()
                 elif menu.new_g.is_pointing(pos):
-                    choose_game()
+                    save = Button((255, 0, 100), 500, 645, 150, 50, 24, 'Zapisz')
+                    load = Button((255, 0, 100), 325, 645, 150, 50, 24, 'Wczytaj')
+                    check_b = Button((255, 0, 100), 150, 645, 150, 50, 24, 'Sprawdz')
+                    choose_game(save, load, check_b)
                     # main_singleplayer.play_game()
                     menu = Menu()
                 elif menu.info.is_pointing(pos):
                     display_instructions()
                     menu = Menu()
                 elif menu.load.is_pointing(pos):
-                    main_singleplayer.play_game(1)
+                    save = Button((255, 0, 100), 500, 645, 150, 50, 24, 'Zapisz')
+                    load = Button((255, 0, 100), 325, 645, 150, 50, 24, 'Powrót')
+                    check_b = Button((255, 0, 100), 150, 645, 150, 50, 24, 'Sprawdz')
+                    main_singleplayer.play_game(save, load, check_b, 1)
 
 
 if __name__ == "__main__":
