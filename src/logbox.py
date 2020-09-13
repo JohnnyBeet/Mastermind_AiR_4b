@@ -38,7 +38,8 @@ class LogBox(GFXEntity):
 
     def load_text(self, input_text: str):
         """ Wczytuje log z gry na koniec okna dialogowego """
-        if input_text != self._texts[-1]:
+        if input_text != self._texts[-1] and not(input_text == "Rozpoczales    nowa    gre" and
+                                                 input_text in self._texts):
             for i, _ in enumerate(self._texts):
                 if i < self._n_texts - 1:
                     self._texts[i] = self._texts[i + 1]

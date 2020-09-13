@@ -43,6 +43,7 @@ class SaveData:
         self.rows = rows
         self.game_type = game_type
         self.winning_code = _winning_code
+        self.rows_of_pegs = None
         with open('SaveAndLoadGame/save.txt', 'w') as outfile:
             json.dump(self.__dict__, outfile)
 
@@ -92,7 +93,8 @@ class SaveData:
         #         for j in range(self.n_pegs):
         #             self.rows_of_pegs = saved_letters[i + j * self.rows]
 
-    def save_logbox(self, texts: list):
+    @staticmethod
+    def save_logbox(texts: list):
         with open('SaveAndLoadGame/logbox_texts.txt', 'w+') as saved_text_file:
             json.dump(texts, saved_text_file)
 
