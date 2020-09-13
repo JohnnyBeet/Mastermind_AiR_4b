@@ -1,5 +1,15 @@
 # Mastermind_AiR_4b Dokumentacja
 
+## Spis treści
+* [Funkcjonalości](#funkcjonalnoci)
+* [Wybór platformy](#wybr-platformy)
+* [Na czym polega Mastermind?](#na-czym-polega-mastermind)
+* [Technologia](#technologia)
+* [Przykład działania](#przykad-dziaania)
+* [Uruchamianie](#uruchamianie)
+* [Historia zmian](#historia-zmian)
+* [Autorzy](#autorzy)
+
 ## Funkcjonalności
 - Implementacja zasad gry.
 - Gra z komputerem.
@@ -20,3 +30,32 @@ Przy tworzeniu projektu korzystano z następujących narzędzi:
  - Python 3.8
  - pygame 1.9.6
  - JSON
+ 
+ ## Przykład działania
+<details>
+  <summary>Rozwiń</summary>
+  
+ ![Tak to działa](/gfx/how_it_works.gif)
+ 
+</details>
+
+## Uruchamianie
+Aby uruchomić grę należy najpierw upewnić się, czy posiada się wszystkie wymagane pakiety.
+W tym celu będąc w katalogu głównym gry wpisujemy w cmd:
+
+    pip install -r requirements.txt
+
+A następnie aby już zagrać:
+
+    python menu.py
+    
+Bądź też można skorzystać z pliku 'Zagraj.bat', który włączy grę za nas.
+
+## Historia zmian
+Historię zmian można sprawdzić [tutaj](https://github.com/JohnnyBeet/Mastermind_AiR_4b/commits/master)
+
+## Autorzy
+- a
+- b
+- c
+- d

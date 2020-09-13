@@ -13,10 +13,6 @@ from src.settings_loading import (
 
 """ Główny plik gry uruchamiany z menu. Obsługuje zarówno tryb klasyczny jak i słowny Mastermind """
 
-# TODO: przydałoby się również ładować i zapisywać poprzednio wybrany tryb gry (można skorzystać z json_data["_type"]
-#  w pliku save_load_test.py)
-# if loaded: #loaded bedzie klasa utworzona przy wczytywaniu gry
-#     GAME_MODE = loaded.game_type
 GAME_MODE = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
 
 
@@ -86,7 +82,6 @@ def play_game(is_loaded=0):
         data.normal_mastermind += 1
         data.save_stats()
 
-    # TODO: board można tworzyć z zapisanych parametrów w następujący sposób:
     if is_loaded:
         peg_num = save_class.n_pegs
         row_num = save_class.rows
@@ -100,14 +95,12 @@ def play_game(is_loaded=0):
         row_num,
         GAME_MODE  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
     )
-    # TODO: sugestia, metoda load_game zwraca również struktury loaded_rows_of_pegs, loaded_winning_pegs,
-    #  loaded_active_row, zatem wystarczy zrobić następującą podmianę aby wznowić już wcześniej zapisaną planszę board:
+
     if is_loaded:
         board.rows_of_pegs = save_class.rows_of_pegs
         board.winning_pegs = save_class.winning_code
         board.active_row = save_class.active_row
 
-    # TODO: logi z logbox'a też powinny być zapisywane i odczytywane
     logbox = LogBox(
         logbox_configs["pos"],
         logbox_configs["size"],
@@ -116,7 +109,7 @@ def play_game(is_loaded=0):
         screen,
         logbox_configs["number_of_messages_displayed"],
     )
-    # można je podmienić następująco:
+
     if is_loaded:
         logbox.texts = save_class.texts
 

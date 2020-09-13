@@ -1,7 +1,5 @@
 import json
-
 """ Wczytywanie danych z pliku CONFIG.txt do odpowiednich miejsc w plikach src """
-
 
 with open("src/CONFIG.txt") as f:
     data = json.load(f)
