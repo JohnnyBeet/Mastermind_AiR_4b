@@ -128,7 +128,7 @@ def main():
                     menu = Menu()
                 elif menu.load.is_pointing(pos):
                     save = Button((255, 0, 100), 500, 645, 150, 50, 24, 'Zapisz')
-                    load = Button((255, 0, 100), 325, 645, 150, 50, 24, 'Powrót')
+                    load = Button((255, 0, 100), 325, 645, 150, 50, 24, 'Wczytaj')
                     check_b = Button((255, 0, 100), 150, 645, 150, 50, 24, 'Sprawdz')
                     main_singleplayer.play_game(save, load, check_b, 1)
 
