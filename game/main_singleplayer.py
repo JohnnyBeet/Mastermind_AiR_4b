@@ -132,6 +132,7 @@ def play_game(save, back, check_b, is_loaded=0):
                 if save.is_pointing(pos):
                     save_class.save_game(board.active_row, board.n_pegs, board.n_rows, GAME_MODE, board.rows_of_pegs, board.winning_pegs)
                 elif back.is_pointing(pos):
+                    pygame.display.quit()
                     main()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:

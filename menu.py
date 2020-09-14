@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import sys
 # from Menu.Buttons import Button
 from Statistics.statistics import *
 from Instructions.instructions import *

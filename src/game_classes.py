@@ -525,7 +525,6 @@ class CheckButton(Button):
         winning_pegs = board.winning_pegs
         rows_of_pegs = board.rows_of_pegs
         n_pegs = board.n_pegs
-        n_rows = board.n_rows
         board_state = [
             item.color
             if pegs_or_letters == "Peg"
