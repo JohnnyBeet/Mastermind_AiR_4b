@@ -5,6 +5,7 @@
 from Statistics.statistics import *
 from Instructions.instructions import *
 from game import main_singleplayer
+import sys
 
 
 class Menu:
@@ -87,6 +88,8 @@ def choose_game(save, back, check_b):
     choice = ChooseGame()
     while not is_done:
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 if choice.normal.is_pointing(pos):
