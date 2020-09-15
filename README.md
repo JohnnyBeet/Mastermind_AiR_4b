@@ -8,7 +8,6 @@
 * [Przykład działania](#przykad-dziaania)
 * [Uruchamianie](#uruchamianie)
 * [Historia zmian](#historia-zmian)
-* [Autorzy](#autorzy)
 
 ## Funkcjonalności
 - Implementacja zasad gry.
@@ -53,9 +52,3 @@ Bądź też można skorzystać z pliku 'Zagraj.bat', który włączy grę za nas
 
 ## Historia zmian
 Historię zmian można sprawdzić [tutaj](https://github.com/JohnnyBeet/Mastermind_AiR_4b/commits/master)
-
-## Autorzy
-- a
-- b
-- c
-- d

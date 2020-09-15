@@ -181,6 +181,11 @@ class GFXEntity(ABC):
         else:
             raise TypeError("Nie potrafię stworzyć obiektu z takich danych!")
 
+    @property
+    def rect(self) -> pygame.Rect:
+        """ Zwraca obiekt typu rect potrzebny to sprawdzania kolizji z myszką """
+        return self._rect.copy()
+
 
 class Peg(GFXEntity):
     """ Klasa kołka/kamyczka (w zależności od interpretacji wizualnej) """
@@ -197,32 +202,29 @@ class Peg(GFXEntity):
         """ Rysuje kołek w wskazanym oknie """
         pygame.draw.circle(self._window, self._color, self._pos, self._radius)
 
-    def change(self, mouse_cords: list, clicked: list) -> list:
-        """ Metoda służy do zmieniania koloru kołka.
-            Zwraca listę z wartościami boolowskimi, które są używane
-            w niezawodnym systemie wprowadzania informacji z myszki
-        """
+    def change(self):
+        """ Metoda służy do zmieniania koloru kołka. """
+        self._state += 1
+        if self._state >= len(colors) - 2:
+            self._state = 1
         for i, key in enumerate(colors):
             if i == self._state:
                 self._color = colors[key]
-                if i == len(colors) - 1:
-                    self._state = 0
                 break
-        x, y = mouse_cords
-        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
-        if self._rect.collidepoint(x, y) and lmb and rmb:
-            self._state += 1
-            clicked = [False, True]
 
-        return clicked
+    def change_reversed(self):
+        """ Metoda służy do zmieniania koloru kołka - tyle że na odwrót. """
+        self._state -= 1
+        if self._state <= 0:
+            self._state = len(colors) - 2
+        for i, key in enumerate(colors):
+            if i == self._state:
+                self._color = colors[key]
+                break
 
     @property
     def color(self):
         return self._color
-
-    @property
-    def rect(self):
-        return self._rect
 
 
 class Letter(GFXEntity):
@@ -299,19 +301,14 @@ class Letter(GFXEntity):
             self._window, self._letter_rect, self._value, self._font_color
         )
 
-    def change(self, mouse_cords: list, clicked: list) -> list:
+    def change(self):
         """ Metoda służy do zmieniania wartości literki.
             Zwraca listę z wartościami boolowskimi, które są używane
             w niezawodnym systemie wprowadzania informacji z myszki
         """
-        x, y = mouse_cords
-        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
-        if self.rect.collidepoint(x, y) and lmb and rmb:
-            new_value = code_input(self._window)
-            if new_value in allowed_characters and len(new_value) == 1:
-                self._value = new_value
-            clicked = [False, True]
-        return clicked
+        new_value = code_input(self._window)
+        if new_value in allowed_characters and len(new_value) == 1:
+            self._value = new_value
 
 
 class Board(GFXEntity):
@@ -465,12 +462,6 @@ class Board(GFXEntity):
                 for peg in row:
                     peg.draw()
 
-    def change(self, mouse_cords, clicked) -> list:
-        """ Metoda sprawdza po kolei kołki na planszy, czy zostały kliknięte """
-        for peg in self.rows_of_pegs[self.active_row]:
-            clicked = peg.change(mouse_cords, clicked)
-        return clicked
-
     @property
     def message(self):
         return self._message
@@ -489,6 +480,14 @@ class Board(GFXEntity):
         return rects
 
     @property
+    def elements(self):
+        """ Zwraca obiekty znajdujące się na planszy """
+        elems = [self.button]
+        for peg in self.rows_of_pegs[self.active_row]:
+            elems.append(peg)
+        return elems
+
+    @property
     def n_pegs(self):
         return self._n_pegs
 
@@ -496,30 +495,31 @@ class Board(GFXEntity):
 class Button(GFXEntity):
     """ Klasa przycisku """
 
-    clicked = False
+    _clicked = False
 
     def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size: tuple):
         super().__init__(pos, color, window, size)
 
-    def interact(self, mouse_cords, clicked):
-        x, y = mouse_cords
-        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
-        if self._rect.collidepoint(x, y) and lmb and rmb:
-            self.clicked = True
-            return [False, True]
-        else:
-            self.clicked = False
-            return clicked
+    @property
+    def clicked(self):
+        return self._clicked
+
+    def change(self):
+        self._clicked = not self._clicked
 
 
-class CheckButton(Button):
+class CheckButton(GFXEntity):
     """ Przycisk używany na planszy do sprawdzenia stanu gry """
 
     def __init__(self, pos: tuple, color: tuple, window: pygame.Surface, size: tuple):
         super().__init__(pos, color, window, size)
 
-    def click_button(self, board: Board, mouse_cords: tuple, clicked: tuple) -> list:
-        """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu. """
+    @staticmethod
+    def change(board: Board) -> bool:
+        """ Sprawdza czy przycisk został wciśnięty oraz czy gracz nie zgadł kodu.
+            Zwraca True jeżeli gra została zakończona, a False jeżeli nadal trwa.
+        """
+        what_to_return = False
         pegs_or_letters = board.type
         active_row = board.active_row
         winning_pegs = board.winning_pegs
@@ -533,57 +533,48 @@ class CheckButton(Button):
             else []
             for item in rows_of_pegs[active_row]
         ]
-        x, y = mouse_cords
-        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
-        if self._rect.collidepoint(x, y) and lmb and rmb:
-            if (
-                winning_pegs
-                != [colors["white"] for _ in range(n_pegs)]
-                != board_state
-                != ["" for _ in range(n_pegs)]
-            ):
-                if board_state == winning_pegs:
-                    board.message = "wygrales    !!!"
-                    data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
-                    data.win_percentage = round(
-                        (data.won_matches / data.played_matches) * 100
-                    )
-                    data.save_stats()
-                    return [False, False]
-                else:
-                    # zlicza ile kolorów zostało trafionych przez gracza
-                    bulls, cows = 0, 0
-                    already_used_user = [False for _ in range(n_pegs)]
-                    already_used_secret = [False for _ in range(n_pegs)]
-                    for i, value in enumerate(board_state):
-                        if value == winning_pegs[i]:
-                            bulls += 1
-                            already_used_secret[i] = True
-                            already_used_user[i] = True
-                    for i in range(n_pegs):
-                        for j in range(n_pegs):
-                            if already_used_user[j] or already_used_secret[i]:
-                                continue
-                            if winning_pegs[i] == board_state[j]:
-                                cows += 1
-                                already_used_secret[i] = True
-                                already_used_user[j] = True
-
-                    board.message = (
-                        f'{board.active_row + 1}{" " * 8}Row{" " * 8}{bulls}{" " * 8}bulls{" " * 8}{cows}'
-                        f'{" " * 8}   cows'
-                    )
-                    active_row += 1
-                    if active_row >= board.n_rows:
-                        board.message = "przegrales   !!!"
-                        return [False, False]
-                clicked = [False, True]
+        if (
+            winning_pegs
+            != [colors["white"] for _ in range(n_pegs)]
+            != board_state
+            != ["" for _ in range(n_pegs)]
+        ):
+            if board_state == winning_pegs:
+                board.message = "wygrales    !!!"
+                data.won_matches += 1  # jesli wygralismy, trzeba to odnotowac
+                data.win_percentage = round(
+                    (data.won_matches / data.played_matches) * 100
+                )
+                data.save_stats()
             else:
-                board.message = "Wszystkie    pola    nie    moga    byc    puste!"
-        board.active_row = active_row
-        return clicked
+                # zlicza ile kolorów zostało trafionych przez gracza
+                bulls, cows = 0, 0
+                already_used_user = [False for _ in range(n_pegs)]
+                already_used_secret = [False for _ in range(n_pegs)]
+                for i, value in enumerate(board_state):
+                    if value == winning_pegs[i]:
+                        bulls += 1
+                        already_used_secret[i] = True
+                        already_used_user[i] = True
+                for i in range(n_pegs):
+                    for j in range(n_pegs):
+                        if already_used_user[j] or already_used_secret[i]:
+                            continue
+                        if winning_pegs[i] == board_state[j]:
+                            cows += 1
+                            already_used_secret[i] = True
+                            already_used_user[j] = True
+                            what_to_return = True
 
-    @property
-    def rect(self):
-        """ Zwraca obiekt typu rect potrzebny to sprawdzania kolizji z myszką """
-        return self._rect.copy()
+                board.message = (
+                    f'{board.active_row + 1}{" " * 8}Row{" " * 8}{bulls}{" " * 8}bulls{" " * 8}{cows}'
+                    f'{" " * 8}   cows'
+                )
+                active_row += 1
+                if active_row >= board.n_rows:
+                    board.message = "przegrales   !!!"
+                    what_to_return = True
+        else:
+            board.message = "Wszystkie    pola    nie    moga    byc    puste!"
+        board.active_row = active_row
+        return what_to_return

@@ -1,9 +1,6 @@
 from typing import Tuple
 import pygame.freetype
-from  src.game_classes import SaveData
 from src.game_classes import GFXEntity
-
-save_class = SaveData()
 
 
 class LogBox(GFXEntity):
@@ -45,7 +42,6 @@ class LogBox(GFXEntity):
                     self._texts[i] = self._texts[i + 1]
                 else:
                     self._texts[i] = input_text
-            save_class.save_logbox(self._texts) 
 
     def print_text(self, font: pygame.freetype.Font):
         """ Wyświetla  okno dialogowe """

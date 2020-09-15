@@ -94,9 +94,11 @@ def choose_game(save, back, check_b):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 if choice.normal.is_pointing(pos):
+                    pygame.display.quit()
                     main_singleplayer.GAME_MODE = "Peg"
                     main_singleplayer.play_game(save, back, check_b, 0)
                 elif choice.word.is_pointing(pos):
+                    pygame.display.quit()
                     main_singleplayer.GAME_MODE = "Letter"
                     main_singleplayer.play_game(save, back, check_b, 0)
                 elif choice.back.is_pointing(pos):
@@ -134,6 +136,7 @@ def main():
                     save = Button((255, 0, 100), 500, 645, 150, 50, 24, 'Zapisz')
                     back = Button((255, 0, 100), 325, 645, 150, 50, 24, 'Menu')
                     check_b = Button((255, 0, 100), 150, 645, 150, 50, 24, 'Sprawdz')
+                    pygame.display.quit()
                     main_singleplayer.play_game(save, back, check_b, 1)
 
 

@@ -11,11 +11,32 @@ class TriangularButton(Button):
     """ Przycisk używany do zmiany parametrów startowych gry """
 
     def __init__(
-        self, pos: tuple, color: tuple, window: pygame.Surface, side, orientation
+        self, pos: tuple, color: tuple, window: pygame.Surface, side, orientation, id_range
     ):
         super().__init__(pos, color, window, (0, 0))
         self.side = side
         self.orientation = orientation  # left or right
+        self._value_id = 0
+        self.id_range = id_range
+
+    @property
+    def value_id(self):
+        return self._value_id
+
+    @value_id.setter
+    def value_id(self, new_id):
+        if new_id in self.id_range:
+            self._value_id = new_id
+
+    def change(self):
+        """ Zmienia wartość zmiennej pod którą zostanie podpięty przycisk """
+        if self.orientation == "left":
+            if self._value_id - 1 in self.id_range:
+                self._value_id -= 1
+
+        elif self.orientation == "right":
+            if self._value_id + 1 in self.id_range:
+                self._value_id += 1
 
     def draw(self):
         x, y = self._pos
@@ -34,21 +55,6 @@ class TriangularButton(Button):
                 self._color,
                 [(x, y), (x, y + y_offset), (x - x_offset, y + a)],
             )
-
-    def change_value(self, i, i_range):
-        """ Zmienia wartość zmiennej pod którą zostanie podpięty przycisk """
-        if self.orientation == "left":
-            if i - 1 in i_range:
-                return i - 1
-            else:
-                return i
-        elif self.orientation == "right":
-            if i + 1 in i_range:
-                return i + 1
-            else:
-                return i
-        else:
-            return i
 
     def get_rect(self):
         return self._rect.copy()
@@ -77,7 +83,7 @@ class Display(GFXEntity):
     ):
         super().__init__(pos, color, window, size)
         self.displayable_values = values
-        self.displayed_value = values[0]
+        self._displayed_value = values[0]
         self.values_range = [i for i, _ in enumerate(self.displayable_values)]
         self.font = pygame.freetype.Font(font, font_size)
         self.font_color = font_color
@@ -89,6 +95,7 @@ class Display(GFXEntity):
             window,
             self.button_side,
             "left",
+            self.values_range
         )
         self.right_button = TriangularButton(
             (x + self.button_gap, y),
@@ -96,13 +103,14 @@ class Display(GFXEntity):
             window,
             self.button_side,
             "right",
+            self.values_range
         )
 
     @property
     def offset(self):
-        if self.displayed_value in ["easy", "hard"]:
+        if self._displayed_value in ["easy", "hard"]:
             self.default_offset = -30
-        elif self.displayed_value in ["normal", "master"]:
+        elif self._displayed_value in ["normal", "master"]:
             self.default_offset = -45
         return self.default_offset
 
@@ -115,25 +123,21 @@ class Display(GFXEntity):
     def display_rect(self):
         return pygame.Rect(self.display_pos, self.display_size)
 
-    def change_value(self, mouse_cords: list, clicked: list) -> list:
+    @property
+    def displayed_value(self):
         """ Zmienia wartość wyświetlanej wartości zmiennej """
-        x, y = mouse_cords
-        lmb, rmb = clicked  # sprawdza czy lewy i prawy przycisk myszy został wciśniety w odpowiedniej kolejności
-        if self.left_button.get_rect().collidepoint(x, y) and lmb and rmb:
-            self.value_index = self.left_button.change_value(
-                self.value_index, self.values_range
-            )
-            self.displayed_value = self.displayable_values[self.value_index]
-            clicked = [False, True]
+        previous_value = self._displayed_value
+        id_l, id_r = self.left_button.value_id, self.right_button.value_id
 
-        if self.right_button.get_rect().collidepoint(x, y) and lmb and rmb:
-            self.value_index = self.right_button.change_value(
-                self.value_index, self.values_range
-            )
-            self.displayed_value = self.displayable_values[self.value_index]
-            clicked = [False, True]
+        if id_l != id_r:
+            if self.displayable_values[id_l] == previous_value:
+                self._displayed_value = self.displayable_values[id_r]
+                self.left_button.value_id = id_r
+            elif self.displayable_values[id_r] == previous_value:
+                self._displayed_value = self.displayable_values[id_l]
+                self.right_button.value_id = id_l
 
-        return clicked
+        return self._displayed_value
 
     def draw(self):
         super(Display, self).draw()
@@ -183,14 +187,6 @@ class GameSettingMenu(GFXEntity):
         self.difficulty_display.draw()
         self.button.draw()
 
-    def check(self, mouse_cords, clicked) -> list:
-        """ Sprawdza po kolei czy użytkownik zmieniał ustawienia długości kodu, następnie ustawienia poziomu trudności
-        i ostatecznie sprawdza czy te zmiany zostały zatwierdzone """
-        clicked = self.code_lenght_display.change_value(mouse_cords, clicked)
-        clicked = self.difficulty_display.change_value(mouse_cords, clicked)
-        clicked = self.button.interact(mouse_cords, clicked)
-        return clicked
-
     def return_game_settings(self) -> tuple:
         if self.button.clicked:
             code_lenght = int(self.code_lenght_display.displayed_value)
@@ -216,3 +212,15 @@ class GameSettingMenu(GFXEntity):
             self.code_lenght_display.right_button.get_rect(),
         ]
         return rects
+
+    @property
+    def elements(self):
+        """ Zwraca obiekty należące do menu """
+        elems = [
+            self.button,
+            self.difficulty_display.left_button,
+            self.difficulty_display.right_button,
+            self.code_lenght_display.left_button,
+            self.code_lenght_display.right_button,
+        ]
+        return elems

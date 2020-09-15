@@ -6,7 +6,7 @@ import pygame
 
 class Button:
     """ ta klasa określa tylko przyciski prostokątne """
-    def __init__(self, color, x, y, width, height, font_size ,text=''):
+    def __init__(self, color, x, y, width, height, font_size, text=''):
         self.color = color
         self.x = x    # koordynaty lewego, górnego rogu prostokąta
         self.y = y
@@ -15,7 +15,7 @@ class Button:
         self.text = text    # tekst do wyświetlenia na przycisku
         self.font_size = font_size
 
-    def draw(self, window, outline = None):
+    def draw(self, window, outline=None):
         """ rysuje przycisk (z obramówką lub bez) """
         if outline:
             pygame.draw.rect(window, outline, (self.x-2, self.y-2, self.width+4, self.height+4), 0)
