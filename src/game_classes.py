@@ -546,6 +546,7 @@ class CheckButton(GFXEntity):
                     (data.won_matches / data.played_matches) * 100
                 )
                 data.save_stats()
+                what_to_return = True
             else:
                 # zlicza ile kolorów zostało trafionych przez gracza
                 bulls, cows = 0, 0
@@ -564,7 +565,6 @@ class CheckButton(GFXEntity):
                             cows += 1
                             already_used_secret[i] = True
                             already_used_user[j] = True
-                            what_to_return = True
 
                 board.message = (
                     f'{board.active_row + 1}{" " * 8}Row{" " * 8}{bulls}{" " * 8}bulls{" " * 8}{cows}'

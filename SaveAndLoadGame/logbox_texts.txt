@@ -1,1 +1,1 @@
-["", "", "Rozpoczales    nowa    gre", "1        Row        1        bulls        0           cows"]
+["", "", "Rozpoczales    nowa    gre", "1        Row        2        bulls        0           cows"]
