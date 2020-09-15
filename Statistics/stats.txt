@@ -1,1 +1,1 @@
-{"played_matches": 185, "won_matches": 93, "win_percentage": 50, "normal_mastermind": 134, "word_version": 51}
+{"played_matches": 211, "won_matches": 95, "win_percentage": 45, "normal_mastermind": 156, "word_version": 55}

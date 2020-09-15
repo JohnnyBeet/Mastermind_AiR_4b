@@ -17,7 +17,7 @@ from src.settings_loading import (
 GAME_MODE = 'Peg'  # wstawienie tutaj 'Letter' uruchamia tryb słowny, a 'Peg' tryb z kolorami
 
 
-def play_game(save, back, check_b, is_loaded=0):
+def play_game(save, back, check_b, is_loaded=1):
     """ Ta funkcja jest konieczna do odpalenia gry z poziomu menu, uzycie exec() na tym pliku
         nie dawalo oczekiwanych rezultatow. """
     global GAME_MODE
@@ -40,9 +40,9 @@ def play_game(save, back, check_b, is_loaded=0):
         )
 
         menu.draw()  # pygame.Rect trójkątnych przycisków pojawiają się dopiero po narysowaniu
-        clickable_rects = menu.rects
-        elements = menu.elements
-        engaged_rect_lmb = None
+        clickable_rects_menu = menu.rects
+        elements_menu = menu.elements
+        engaged_rect = None
         while not (peg_num and row_num):
             """ Pętla menu wyboru parametrów gry """
             for event in pygame.event.get():
@@ -51,19 +51,19 @@ def play_game(save, back, check_b, is_loaded=0):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if pygame.mouse.get_pressed()[0]:
                         x, y = pygame.mouse.get_pos()
-                        for rect in clickable_rects:
+                        for rect in clickable_rects_menu:
                             if rect.collidepoint(x, y):
-                                engaged_rect_lmb = rect
+                                engaged_rect = rect
                     else:
-                        engaged_rect_lmb = None
+                        engaged_rect = None
                 if event.type == pygame.MOUSEBUTTONUP:
-                    if engaged_rect_lmb:
+                    if engaged_rect:
                         x, y = pygame.mouse.get_pos()
-                        if not pygame.mouse.get_pressed()[0] and engaged_rect_lmb.collidepoint(x, y):
-                            for element in elements:
-                                if element.rect == engaged_rect_lmb:
+                        if not pygame.mouse.get_pressed()[0] and engaged_rect.collidepoint(x, y):
+                            for element in elements_menu:
+                                if element.rect == engaged_rect:
                                     element.change()
-                                    engaged_rect_lmb = None
+                                    engaged_rect = None
 
                 screen.fill(background)
                 menu.draw()
@@ -118,7 +118,7 @@ def play_game(save, back, check_b, is_loaded=0):
     engaged_rect_lmb = None
     engaged_rect_rmb = None
 
-    while not end_game:
+    while True:
         """ Główna pętla gry """
 
         clickable_rects = board.rects
@@ -136,6 +136,8 @@ def play_game(save, back, check_b, is_loaded=0):
                 elif back.is_pointing(pos):
                     pygame.display.quit()
                     main()
+                elif end_game:
+                    sys.exit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = pygame.mouse.get_pos()
